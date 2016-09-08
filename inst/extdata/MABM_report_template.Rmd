@@ -1,0 +1,52 @@
+---
+title: placeholder 
+subtitle: placeholder
+author: '`r params$year`'
+date: '`r params$station`'
+output: 
+  pdf_document:
+    includes:
+      in_header: MABM_report_preamble.tex
+urlcolor: blue
+params:
+  year: 0 # placeholder 
+  station: placeholder
+  stn_start_yr: 0 # placeholder
+  n_nwr: 0 # placeholder
+  n_es: 0 # placeholder
+  route_path: placeholder
+  survey_path: placeholder
+  bat_path: placeholder
+  spp_path: placeholder
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, echo=FALSE)
+```
+
+The Region 4 Inventory and Monitoring Branch coordinated acoustical bat monitoring on `r params$n_nwr` National Wildlife Refuges and `r params$n_es` Ecological Services field offices in Regions 2, 3, and 4 during the `r params$year` field season. Surveys establish baseline inventories of bat species at each station and contribute to a landscape-level understanding of bat population trends and habitat associations. Bat call data were collected using Anabat SD2 detectors along road-based transects during June and July each year following the procedures outlined in the Mobile Bat Acoustical Survey Protocol^[U.S Fish and Wildlife Service. 2012. Mobile Bat Acoustical Survey Protocol, U.S. Fish and Wildlife Service, Region 4, Division of Refuges].
+
+This report summarizes bat calls collected along driven survey routes at `r params$station` in `r params$year` and provides annual species detections from `r params$stn_start_yr` to `r params$year - 1` for comparison. Calls were classified using the BCID Eastern USA (version 2.7c) software.  Automated acoustical bat classification is limited in part by call quality, species filter constraints, and statistical model agreement parameters. We applied a species filter to limit classifications only to those bat species expected to occur at `r params$station` during the sampling interval. We considered species classifications conservatively by classifying only those calls with $\geq$ 5 ultrasonic pulses.  While we expect that this conservative approach resulted in robust species classifications, it necessarily means that we may underestimate the actual number of bats detected.  We geo-referenced calls to the nearest corresponding GPS location collected along the route. 
+
+The accuracy of call classification varies among species but is generally reported to be > 85% correct. Measures of confidence in species identification are available as a maximum-likelihood estimator p-value for each observed species in the BCID output files included in this report package. BCID software does not classify the following species: Seminole bat (*Lasiurus seminolus*), Northern yellow bat (*Lasiurus intermedius*), or Brazilian free-tailed bat (*Tadarida brasiliensis*). These species generally will be classified to a species with the closest model agreement or classified as "unknown." 
+
+This annual report package contains summary information on route surveys, and a digital folder containing shapefiles and BCID classification output files. Summary tables include all classified species observations including those lacking an associated spatial reference.  All submitted raw call data and survey metadata are archived and available on the Mobile Acoustical Bat Monitoring SharePoint site [(https://fishnet.fws.doi.net/regions/4/nwrs/IM/bats)](https://fishnet.fws.doi.net/regions/4/nwrs/IM/bats). Bat call files, GPS data, and survey metadata sheets were reviewed for quality assurance prior to generation of this report. Some submitted data were necessarily excluded due to errors identified in the collection processes. 
+
+\clearpage
+
+```{r, include=FALSE}
+## Retrieve data
+route_dat <- readRDS(params$route_path)
+survey_dat <- readRDS(params$survey_path)
+call_dat <- readRDS(params$bat_path)
+spp_info <- readRDS(params$spp_path)
+
+## Retrieve route-level report generating code
+route_rmd <- system.file("extdata", "route_report.Rmd", package = "MABMreportr")
+
+## Generate reports for each route at station
+routes <- sort(route_dat$site)
+src <- lapply(routes, function(route) knitr::knit_expand(file = route_rmd))
+```
+
+`r knitr::knit(text = unlist(src))`

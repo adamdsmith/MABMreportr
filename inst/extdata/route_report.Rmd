@@ -1,0 +1,174 @@
+```{r data-prep-{{route}}, echo=FALSE}
+station_short <- station %>% gsub("national wildlife refuge", "NWR", ., ignore.case = TRUE) %>%
+    gsub("ecological services", "ES", ., ignore.case = TRUE)
+
+route_info <- route_dat[which(route_dat$site == "{{route}}"), ]
+survey_info <- survey_dat[which(survey_dat$site == "{{route}}"), ]
+call_info <- call_dat[which(call_dat$site == "{{route}}"), ]
+
+## Make header
+colon <- ifelse(!is.na(route_info$site_notes), paste(":", route_info$site_notes), "")
+route_header <- paste0(station_short, colon, " (", route_info$site, ") route")
+```
+
+# `r route_header`
+
+```{r survey_log-{{route}}}
+# Tally bat calls for each survey night
+surv_calls <- call_info %>% 
+    dplyr::filter(surv_date %in% survey_info$surv_date) %>%
+    dplyr::group_by(surv_date) %>% dplyr::count()
+
+surv_log <- survey_info %>%
+    dplyr::left_join(., surv_calls, by = "surv_date") %>%
+    dplyr::select(surv_date, n, complete, gps, notes) %>%
+    dplyr::mutate(surv_date = format(surv_date, format = "%d %b"))
+
+texble(surv_log, 
+       caption = paste0(year, " survey route (", route_info$site, ") summary."),
+       col_names = c("Survey date", "\\# bat \\newline calls",
+                     "Route \\newline completed?", "GPS \\newline data?",
+                     "Survey notes"),
+       col_widths = c(2.5, 1.5, 1.75, 1.5, 7),
+       col_types = c("L", rep("C", 3), "L"), linespace = "5pt") 
+```
+
+\vspace{0.25in}
+
+```{r nightly_summary-{{route}}}
+# Tally bat calls, by species, for each survey night in reporting year
+spp_calls <- call_info %>% 
+    dplyr::filter(surv_date %in% survey_info$surv_date) %>%
+    dplyr::group_by(spp, surv_date) %>% dplyr::count() %>% 
+    dplyr::ungroup() %>% tidyr::complete(spp, surv_date, fill = list(n = 0)) %>%
+    dplyr::left_join(spp_info, by = "spp") %>%
+    dplyr::select(spp_cn, surv_date, n) %>% 
+    dplyr::arrange(spp_cn) %>%
+    dplyr::mutate(surv_date = format(surv_date, format = "%d %b"),
+                  spp_cn = ifelse(duplicated(spp_cn), "", spp_cn),
+                  det_rate = n / route_info$len_mi)
+
+texble(spp_calls, digits = 2,
+       caption = paste0(year, " survey route (", route_info$site, ") nightly species detection summary.  ",
+                        "Total route length = ", route_info$len_mi, " miles."),
+       col_names = c("Species", "Survey date", "\\# bats \\newline detected", "Bats mile"),
+       col_widths = c(4.5, 2.5, 1.5, 1.5),
+       col_types = c("L", rep("C", 3))) 
+```
+
+\clearpage
+
+## Species detection summary (`r paste(params$stn_start_yr, params$year, sep = " - ")`)
+
+```{r route_spp_history-{{route}}}
+# Tally bat calls, by species, for each year in the MABM database
+surv_ns <- call_info %>% dplyr::filter(year <= params$year) %>%
+  dplyr::group_by(year) %>% 
+  dplyr::mutate(n_survs = dplyr::n_distinct(surv_date)) %>%
+  dplyr::select(year, n_survs) %>% unique()
+spp_calls <- call_info %>% dplyr::filter(year <= params$year) %>%
+  dplyr::group_by(year) %>% 
+  dplyr::group_by(spp, year) %>% dplyr::count() %>% 
+  dplyr::ungroup() %>% tidyr::complete(spp, year, fill = list(n = 0)) %>%
+  dplyr::left_join(surv_ns, by = "year") %>%
+  dplyr::left_join(spp_info, by = "spp") %>%
+  dplyr::select(spp_cn, year, n, n_survs) %>%
+  dplyr::arrange(spp_cn) %>%
+  dplyr::mutate(det_rate = n / (route_info$len_mi * n_survs))
+
+# Adjust common name column for nicer table
+spp_table <- dplyr::mutate(spp_calls, 
+                           spp_cn = ifelse(duplicated(spp_cn), "", spp_cn))
+
+# Generate table
+texble(spp_table, digits = 2, longtable = TRUE,
+       caption = paste0("Annual survey route (", route_info$site, ") species detection summary, ",
+                        "including classified calls without a spatial reference.  ",
+                        "Total route length = ", route_info$len_mi, " miles."),
+       col_names = c("Species", "Year", "Total \\# \\newline detected",
+                     "\\# surveys", "Total \\newline bats/mile"),
+       col_widths = c(4.5, 1.5, 1.5, 1.5, 1.5),
+       col_types = c("L", rep("C", 4)), tbl_float = "H") 
+```
+
+```{r route_spp_plot-{{route}}, fig.keep = "none"}
+theme_set(theme_classic(base_size = 15))
+
+# Determine page orientation and figure dimensions
+lscape <- (dplyr::n_distinct(spp_calls$spp_cn) > 8)
+fig_wd <- ifelse(!lscape, 6, 9)
+nrows <- ceiling(dplyr::n_distinct(spp_calls$spp_cn)/ifelse(!lscape, 2, 3))
+reduce <- all(lscape, nrows > 3)
+asp <- ifelse(reduce, 0.48, 0.618)
+fig_ht <- 3 * nrows * asp
+
+# Shift point labels accordingly
+spp_calls <- shift_point_y(spp_calls, "spp_cn", "det_rate", 
+                           shift_prop = ifelse(reduce, 0.175, 0.125), 
+                           ymin = 0)
+
+# Now create plot
+p <- ggplot(spp_calls, aes(x = year, y = det_rate)) + 
+    geom_line() +
+    geom_point(aes(size = n_survs), shape = 21, fill = "white") +
+    geom_text(aes(y = adj_y, label = n), hjust = 0.5, vjust = 0.5, size = 2.5) + 
+    scale_size("# surveys", range = c(1,3), breaks = seq(max(spp_calls$n_survs)), 
+               limits = c(1, max(spp_calls$n_survs)),
+               guide = guide_legend(title.hjust =0.5, title.position = "top", nrow = 1)) +
+    scale_x_continuous("Year", expand = c(0.075, 0)) + 
+    scale_y_continuous("# individuals / mile", limits = c(0, NA), 
+                       expand = c(ifelse(reduce, 0.095, 0.075), 0)) +
+    facet_wrap(~ spp_cn, ncol = ifelse(!lscape, 2, 3), scales = "free_y") +
+    annotate("segment", x=-Inf, xend=Inf, y=-Inf, yend=-Inf) +
+    annotate("segment", x=-Inf, xend=-Inf, y=-Inf, yend=Inf) +
+    theme(legend.position = "top",
+          legend.background = element_blank(),
+          legend.key.width = unit(0.02, units = "npc"),
+          strip.background = element_blank())
+
+# Save to temp file
+tmp_fig <- tempfile(fileext = ".pdf")
+pdf(tmp_fig, width = fig_wd, height = fig_ht)
+facet_fill_x(p)
+invisible(dev.off())
+
+# Convert slashes to LaTeX can deal with them...
+tmp_fig <- normalizePath(tmp_fig, winslash = "/")
+
+res <- paste(c(if(lscape) "\\begin{landscape}",
+               "\\begin{figure}[H]",
+               "\\centering",
+               paste0("\\includegraphics[width = ", fig_wd, "in, height = ", fig_ht, "in]{", tmp_fig, "}"),
+               paste0("\\caption{Figure version of the previous table.  ",
+                      "Detection rates of bat species.  ", 
+                      "Point size indicates the number of surveys conducted for the route.  ",
+                      "The number associated with each point indicates the total number of individuals detected across all surveys.  ",
+                      "Total route length = ", route_info$len_mi, " miles.}"),
+               "\\end{figure}",
+             if(lscape) "\\end{landscape}"),
+             collapse = "\n")
+structure(res, format = "latex", class = "knitr_kable")
+```
+
+\clearpage
+
+```{r bat_locations-{{route}}}
+
+# Use plot_MABM_route(..., plot_type = "static")
+
+# Convert slashes to LaTeX can deal with them...
+#tmp_fig <- normalizePath(tmp_fig, winslash = "/")
+tmp_fig <- normalizePath("C:/temp/test.pdf", winslash = "/")
+
+res <- paste(c("\\begin{figure}[H]",
+                "\\centering",
+                paste0("\\includegraphics[width = 6in, height = 7in]{", tmp_fig, "}"),
+                paste0("\\caption{Route map superimposed with bat detections across all surveys.  ",
+                       "Total route length = ", route_info$len_mi, " miles.}"),
+                "\\end{figure}"), collapse = "\n")
+structure(res, format = "latex", class = "knitr_kable")
+
+```
+
+\clearpage
+
