@@ -42,7 +42,7 @@ shift_point_y <- function(df, group, y, shift_prop = 0.1, ymin = NULL, ymax = NU
   lu <- data.frame(unique(df[order(df[, group]), group, drop = FALSE]),
                    cutoff =  tapply(df[, y], df[, group], function(x) mean(range(x))),
                    shift = tapply(df[, y], df[, group], function(x)
-                     max(combn(c(ymin, ymax, range(x)), 2, diff)) * shift_prop)
+                     max(utils::combn(c(ymin, ymax, range(x)), 2, diff)) * shift_prop)
 #                   shift = tapply(df[, y], df[, group], function(x) range(x)))
   )
   df$adj_y <- ifelse(df[, y, drop = TRUE] < lu$cutoff[match(df[, group, drop = TRUE], lu$spp_cn)],
