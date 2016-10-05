@@ -6,37 +6,6 @@ Cap <- function(string) {
     }))
 }
 
-facet_fill_x <- function(x)
-{
-    # part of print.ggplot
-    #ggplot2:::set_last_plot(x)
-    grid::grid.newpage()
-    p <- ggplot_build(x)
-    gtable <- ggplot_gtable(p)
-
-    # Find dimensions
-    dims <- apply(p$panel$layout[2:3], 2, max)
-    nrow <- dims[1]
-    ncol <- dims[2]
-
-    # No. panels in the plot
-    panels <- sum(grepl("panel", names(gtable$grobs)))
-    space <- ncol * nrow
-
-    # missing panels
-    n <- space - panels
-
-    # checking whether modifications are needed
-    if(panels != space){
-        # indices of panels to fix
-        idx <- (space - ncol - n + 1):(space - ncol)
-        # copying x-axis of the last existing panel to the chosen panels
-        gtable$grobs[paste0("axis_b",idx)] <- list(gtable$grobs[[paste0("axis_b",panels)]])
-    }
-    # again part of print.ggplot, plotting adjusted version
-    invisible(grid::grid.draw(gtable))
-}
-
 shift_point_y <- function(df, group, y, shift_prop = 0.1, ymin = NULL, ymax = NULL) {
   df <- as.data.frame(df)
   lu <- data.frame(unique(df[order(df[, group]), group, drop = FALSE]),
@@ -51,7 +20,7 @@ shift_point_y <- function(df, group, y, shift_prop = 0.1, ymin = NULL, ymax = NU
   df
 }
 
-render_MABM <- function(out_dir = ".", year, n_nwr, n_es, station, stn_start_yr,
+render_MABM <- function(out_dir, year, n_nwr, n_es, station, stn_start_yr,
                         route_path, survey_path, bat_path, spp_path) {
 
     # Need better error catching, but this will do for now...
@@ -172,4 +141,9 @@ texble <- function (x, digits = getOption("digits"), row_names = NA,
                  collapse = "\n")
 
     structure(res, format = "latex", class = "knitr_kable")
+}
+
+yesno <- function() {
+  ans <- substr(readline(prompt="Does your current working directory contain MABM station related data (y/n/c)?"), 1L, 1L)
+  return(tolower(ans))
 }
