@@ -18,10 +18,11 @@ params:
   survey_path: placeholder
   bat_path: placeholder
   spp_path: placeholder
+  out_dir: placeholder
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, echo=FALSE)
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, echo=FALSE, dpi = 300)
 ```
 
 The Region 4 Inventory and Monitoring Branch coordinated acoustical bat monitoring on `r params$n_nwr` National Wildlife Refuges and `r params$n_es` Ecological Services field offices in Regions 2, 3, and 4 during the `r params$year` field season. Surveys establish baseline inventories of bat species at each station and contribute to a landscape-level understanding of bat population trends and habitat associations. Bat call data were collected using Anabat SD2 detectors along road-based transects during June and July each year following the procedures outlined in the Mobile Bat Acoustical Survey Protocol^[U.S Fish and Wildlife Service. 2012. Mobile Bat Acoustical Survey Protocol, U.S. Fish and Wildlife Service, Region 4, Division of Refuges].
