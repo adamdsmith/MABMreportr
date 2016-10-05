@@ -16,15 +16,24 @@ to the executable.}
 Default (NULL) prompts the user to browse to the file.}
 
 \item{export_dir}{character string indicating desired location to output *.xlsx file from
-Access database; currently not used}
+Access database; default prompts user to browse to desired directory.  See Details for
+recommendations.}
 }
 \value{
-None.This function calls a macro within the MABM database to export
+None. This function calls a macro within the MABM database to export
  MS Excel spreadsheets to a specified directory for use in annual report creation.
 }
 \description{
-This function calls macros inside the MABM database to export data necessary for the
-creating of annual reports for MABM routes.  It only needs to be run a single time after
-the data for a given survey year has been entered into the database.
+This function calls macros inside the MABM database to export the data necessary for
+creating annual reports for MABM routes.  It needs only to be run a single time after
+the data for a given survey year has been entered into the database. This function is
+not likely to be called outside of \code{\link{MABM_report}}
+}
+\section{Recommended export directory}{
+
+It is strongly recommended (required?) that you direct the MABM database macro
+ to export needed files to the base directory containing MABM station related data
+ (i.e., MABM route directories with call files, shapefiles, and annual reports).
+ See the \code{\link{MABM_report}} documentation for further details.
 }
 

@@ -1,8 +1,15 @@
 #' Export data from MABM database necessary for report preparation
 #'
-#' This function calls macros inside the MABM database to export data necessary for the
-#' creating of annual reports for MABM routes.  It only needs to be run a single time after
-#' the data for a given survey year has been entered into the database.
+#' This function calls macros inside the MABM database to export the data necessary for
+#' creating annual reports for MABM routes.  It needs only to be run a single time after
+#' the data for a given survey year has been entered into the database. This function is
+#' not likely to be called outside of \code{\link{MABM_report}}
+#'
+#' @section Recommended export directory:
+#' It is strongly recommended (required?) that you direct the MABM database macro
+#'  to export needed files to the base directory containing MABM station related data
+#'  (i.e., MABM route directories with call files, shapefiles, and annual reports).
+#'  See the \code{\link{MABM_report}} documentation for further details.
 #'
 #' @param access_exe character string indicating the path to the MS Access executable.  Default (NULL)
 #'  attempts to find it in a couple of common places and, if unsuccessful, prompts the user to browse
@@ -10,17 +17,18 @@
 #' @param MABM_access_db character string indicating the path to the MABM MS Access database.
 #'  Default (NULL) prompts the user to browse to the file.
 #' @param export_dir character string indicating desired location to output *.xlsx file from
-#'  Access database; currently not used
-#' @return None.This function calls a macro within the MABM database to export
+#'  Access database; default prompts user to browse to desired directory.  See Details for
+#'  recommendations.
+#' @return None. This function calls a macro within the MABM database to export
 #'  MS Excel spreadsheets to a specified directory for use in annual report creation.
-#' @export
 
 setup_MABM_reports <- function(access_exe = NULL, MABM_access_db = NULL,
                                export_dir = NULL) {
 
-    ## Currently this does not affect where files go...
-    ## The directory is fixed in the Access macro
-    if (is.null(export_dir)) export_dir <- "C:/temp"
+    if (is.null(export_dir)) {
+      export_dir <- choose.dir("C:/", caption = "Select folder for MABM database exports.")
+      if (is.na(export_dir)) stop("No export directory selected.")
+    } else export_dir <- file.path(export_dir)
 
     # Find access executable
     if (is.null(access_exe)) {
@@ -56,20 +64,20 @@ setup_MABM_reports <- function(access_exe = NULL, MABM_access_db = NULL,
     if (!file.exists(MABM_access_db) && tools::file_ext(MABM_access_db) != "accdb")
         stop("MABM database file not found, or wrong file type.")
 
-    # Unfortunately, can't specify output location of macro product dynamically; it's fixed in macro
-    #root_dir <- dirname(MABM_access_db)
     if (!dir.exists(export_dir)) dir.create(export_dir)
 
     # Execute macro with MABM MS Access database
-    # Produces 3 spreadsheets in C:/temp: MABM_routes.xlsx, MABM_survey_details.xlsx, and MABM_calls.xlsx
+    # Produces 4 spreadsheets: MABM_calls, MABM_survey_details, MABM_spp_details,
+    #                          and MABM_routes
     system(paste(shQuote(access_exe),
                  shQuote(normalizePath(MABM_access_db)),
-                 '/x Export_MABM_info /nostartup'))
+                 '/x Export_MABM_info /nostartup /cmd',
+                 export_dir))
 
     if (all(file.exists(file.path(export_dir, "MABM_calls.xlsx")),
             file.exists(file.path(export_dir, "MABM_survey_details.xlsx")),
             file.exists(file.path(export_dir, "MABM_spp_details.xlsx")),
             file.exists(file.path(export_dir, "MABM_routes.xlsx"))))
-        message("\n Access tables successfully exported to ", export_dir, " \n")
+        message("\n MABM Access database tables successfully exported to ", export_dir, " \n")
 
 }
