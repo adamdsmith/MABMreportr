@@ -144,6 +144,6 @@ texble <- function (x, digits = getOption("digits"), row_names = NA,
 }
 
 yesno <- function() {
-  ans <- substr(readline(prompt="Does your current working directory contain MABM station related data (y/n/c)?"), 1L, 1L)
+  ans <- substr(readline(prompt="Are MABM DB exports in (or to be exported to) the current directory (y/n/c)?"), 1L, 1L)
   return(tolower(ans))
 }
