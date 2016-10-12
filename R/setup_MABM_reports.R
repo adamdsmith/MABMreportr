@@ -77,7 +77,8 @@ setup_MABM_reports <- function(access_exe = NULL, MABM_access_db = NULL,
     if (all(file.exists(file.path(export_dir, "MABM_calls.xlsx")),
             file.exists(file.path(export_dir, "MABM_survey_details.xlsx")),
             file.exists(file.path(export_dir, "MABM_spp_details.xlsx")),
-            file.exists(file.path(export_dir, "MABM_routes.xlsx"))))
-        message("\n MABM Access database tables successfully exported to ", export_dir, " \n")
+            file.exists(file.path(export_dir, "MABM_routes.xlsx")))) {
+      cat("\nMABM Access database tables successfully exported to", export_dir, "\n\n")
+    } else stop("Export from MABM Access database failed.")
 
 }
