@@ -218,7 +218,7 @@ MABM_report <- function(station = NULL, year = lubridate::year(Sys.Date()),
                   out_dir = out_dir)
     }
 
-    invisible(lapply(stations, dplyr::failwith(NULL, MABMreportr:::make_report)))
+    invisible(lapply(stations, dplyr::failwith(NULL, make_report)))
 
 }
 
