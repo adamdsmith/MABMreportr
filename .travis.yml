@@ -19,7 +19,7 @@ before_install:
   - ./configure --prefix=/usr
   - make
   - sudo make install
-  - cd /home/travis/build/adamdsmith/MABM
+  - cd /home/travis/build/adamdsmith/MABMreportr
 
 notifications:
   email:
