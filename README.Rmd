@@ -52,23 +52,29 @@ library("MABMreportr")
 
 ## Using MABMreportr
 
-We have only two functions with which to concern ourselves, `setup_MABM_reports` and `MABM_report`.  The arguments and options available in each function are detailed in their associated help files: `?setup_MABM_reports` or `?MABM_report`.
+We have only a single function with which to concern ourselves, `MABM_report`.  The arguments and options available for this function are detailed in its associated help file: `?MABM_report`.
 
 ### Preparing to generate annual reports
 
-`setup_MABM_reports` must be called prior to generating annual reports.  In short, this function calls a macro planted inside the MABM database to export the data necessary to create annual reports for MABM routes. It needs only to be run a single time after the data for a given survey year has been entered into the database.
+Prior to the first attempt to generate annual reports (or after the MABM database has been updated with a new season of data), several data tables must be exported from the MABM database.  This is accomplished by calling `MABM_report` using the `update = TRUE` argument (default is `FALSE`). In short, this function calls a macro planted inside the MABM database to export the data necessary to create annual reports for MABM routes. It needs only to be run a single time after the data for a given survey year has been entered into the database.
 
-If all goes according to plan, `setup_MABM_reports` will automagically find the Microsoft Access executable file (if not, it prompts you to do so manually) and prompt you to browse to the local copy of the MABM database.  Currently, the function exports the relevant data from the MABM database to a few *.csv files in the C:/temp directory (which is created if not present on your machine).  This obviously means that `setup_MABM_reports` will not, at present, play nice on Mac OS X and likely Linux machines.
-
-To perform the setup, call the function with no listed arguments:
-
-```{r setup, eval=FALSE}
-setup_MABM_reports()
+```{r, eval = FALSE}
+MABM_report(update = TRUE)
 ```
 
-Assuming the function finds the Microsoft Access executable, you'll be prompted to locate the MABM database.
+You will then be prompted, in the console, to indicate if the current working directory either (1) contains MABM database exports (if you're not updating) or (2) is where you would like to place the exports (if this is the first run or an update).  In the example below, we indicate with 'n' or 'N' that it is not the directory where we wish to place database exports.  Had it been the correct directory, valid responses are 'y' or 'Y'.  'c' or 'C' cancels the function.
 
-![Locate MABM database](./README-figs/select_MABM_database.png)  
+![Initial prompt](./README-figs/MABM_initial_prompt.png)  
+
+Since we indicated 'no', we are then prompted to browse to the directory where we will place MABM database exports.
+
+![Specify MABM export directory](./README-figs/MABM_export_location.png)
+
+If all goes according to plan, the Microsoft Access executable file will be found automagically (if not, it prompts you to do so manually) and then you'll be prompted to browse to the local copy of the MABM database.  
+
+![Select MABM database file](./README-figs/select_MABM_database.png)
+
+With the MABM database identified, the macro within is call and relevant data from the MABM database exported to a few *.xlsx files in the directory you specified initially.  Note that this exporting scheme has not been tested on Mac OS X or Linux machines.
 
 And, when all goes well, you'll be notified on the console.
 
@@ -80,11 +86,7 @@ If the data files exported from the MABM database already exist on your computer
 
 ### Generating annual reports
 
-Once `setup_MABM_reports` is successfully completed, we can start generating reports using the `MABM_report` function. By default, `MABM_report` will generate a report for the current calendar year (change with the `year` argument) for the one or more stations selected from the dialog box; select multiple stations by holding down the control/command button and clicking addition stations.
-
-```{r make_reports, eval=FALSE}
-MABM_report()
-```
+The function then moves on to generating reports. By default, `MABM_report` will generate a report for the current calendar year (change with the `year` argument) for the one or more stations selected from the dialog box; select multiple stations by holding down the control/command button and clicking addition stations.
 
 ![Pick a station(s), any station(s)](./README-figs/select_stations.png)  
 
@@ -92,12 +94,4 @@ The progress of report generation is reported to the console.  Of course success
 
 ![Report generation progress](./README-figs/reports_complete.png)
 
-By default, the reports are output to the current working directory.  Future versions of `MABM_reportr` will attempt to put the reports where they belong, in the directories associated with each station.  Stay tuned...
-
-
-
-
-
-
-
-
+By default (`distribute = TRUE`), the function looks for a particular file hierarchy in the directory specified initially to contain (or in which to output) MABM exports and attempts to place the output report in an 'Annual Report' directory within the base directory for each MABM station, if it can be located. Again, to work properly, this requires a specific directory hierarchy.  Please see the Details section of `?MABM_report` for more information.  This default behavior can be overridden by setting `update = FALSE` and specifying an output location using the `out_dir` argument.  See `?MABM_report` form additional information.
