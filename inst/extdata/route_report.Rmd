@@ -187,7 +187,7 @@ if (nrow(na.omit(spp_calls)) < 1) {
     message("No canonical route shapefile found for ", paste(route_info$site, "route."),
             " Map not created.") 
 } else {
-  req_pckg <- c("cowplot", "devtools", "gridExtra", "rgdal", "sp", "stats")
+  req_pckg <- c("cowplot", "gridExtra", "rgdal", "sp", "stats")
   req_pckg <- sapply(req_pckg, requireNamespace, quietly = TRUE)
   req_pckg <- names(req_pckg)[!req_pckg]
   if (length(req_pckg) > 0) 
