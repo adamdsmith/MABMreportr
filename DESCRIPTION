@@ -19,6 +19,7 @@ Imports:
     lubridate (>= 1.5.6),
     readxl (>= 0.1.1),
     rmarkdown (>= 0.9.5.9),
+    sp (>= 1.2.3),
     utils
 Remotes:
     hadley/ggplot2,
@@ -27,7 +28,6 @@ Suggests:
     cowplot (>= 0.6.3),
     gridExtra (>= 2.2.1),
     rgdal (>= 1.1-10),
-    sp (>= 1.2.3),
     stats (>= 3.2.5)
 License: CC0
 Copyright: This software is in the public domain because it contains materials
