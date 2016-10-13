@@ -21,11 +21,10 @@ Imports:
     rmarkdown (>= 0.9.5.9),
     utils
 Remotes:
-    hadley/ggplot2
+    hadley/ggplot2,
     dkahle/ggmap
 Suggests:
     cowplot (>= 0.6.3),
-    devtools (>= 1.12.0),
     gridExtra (>= 2.2.1),
     rgdal (>= 1.1-10),
     sp (>= 1.2.3),
