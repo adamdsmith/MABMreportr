@@ -69,10 +69,11 @@ setup_MABM_reports <- function(access_exe = NULL, MABM_access_db = NULL,
     # Execute macro with MABM MS Access database
     # Produces 4 spreadsheets: MABM_calls, MABM_survey_details, MABM_spp_details,
     #                          and MABM_routes
-    system(paste(shQuote(access_exe),
-                 shQuote(normalizePath(MABM_access_db)),
-                 '/x Export_MABM_info /nostartup /cmd',
-                 export_dir))
+    status <- system(paste(shQuote(access_exe),
+                           shQuote(normalizePath(MABM_access_db)),
+                           '/x Export_MABM_info /nostartup /cmd',
+                           export_dir))
+    if (status != 0) stop("MABM Access macro failed.")
 
     if (all(file.exists(file.path(export_dir, "MABM_calls.xlsx")),
             file.exists(file.path(export_dir, "MABM_survey_details.xlsx")),
