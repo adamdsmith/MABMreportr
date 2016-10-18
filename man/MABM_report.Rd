@@ -4,7 +4,7 @@
 \alias{MABM_report}
 \title{MABM annual report creation.}
 \usage{
-MABM_report(station = NULL, year = lubridate::year(Sys.Date()),
+MABM_report(station = NULL, year = format(Sys.Date(), "\%Y"),
   MABM_dir = NULL, update = FALSE, distribute = TRUE)
 }
 \arguments{
