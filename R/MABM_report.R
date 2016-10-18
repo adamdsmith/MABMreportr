@@ -20,10 +20,10 @@
 #'  \item{distribute}{When TRUE, the function attempts to place the output in an 'Annual
 #'   Report' directory located in the base directory for a given MABM station, alongside
 #'   the separate directories for each route of that station.  For this to work properly,
-#'   the hierarchy outlined above must exist.}
-#'  \item{out_dir}{If `distribute` = TRUE but a directory matching the shortened route name
-#'   (e.g., BokNWR1) is not located, the output is placed in an 'Annual Report' directory
-#'   in the current working directory, which is created if does not exist.}
+#'   the hierarchy outlined above must exist.  If `distribute` = TRUE but a directory
+#'   matching the shortened route name (e.g., BokNWR1) is not located, or if `distribute`
+#'   = FALSE, the output is placed in an 'Annual Reports' directory just beneath the directory
+#'   identified by `MABM_dir`, which is created if does not exist.}
 #' }
 #'
 #' @section Example directory hierarchy:
@@ -78,15 +78,12 @@
 #' @param distribute logical (default = TRUE) indicating whether to attempt to place the
 #'  output report in an 'Annual Report' directory within the base directory for each station,
 #'  if located. To work properly, a specific directory hierarchy is expected (see Details).
-#' @param out_dir character string indicating path to directory where final report *.pdf(s)
-#'  should be deposited.  Used only if `distribute` = FALSE or distribute attempt fails
-#'  (see Details).  Default is to place in an 'Annual Report' directory (created if does not
-#'  exist) in the current working directory.
+#'  If `distribute` = FALSE or distribute attempt fails (see Details), the output is placed
+#'  in an 'Annual Report' directory beneath \code{MABM_dir}.
 #' @export
 
 MABM_report <- function(station = NULL, year = lubridate::year(Sys.Date()),
-                        MABM_dir = NULL, update = FALSE, distribute = TRUE,
-                        out_dir = "./Annual Report") {
+                        MABM_dir = NULL, update = FALSE, distribute = TRUE) {
 
   if (is.null(MABM_dir)) {
     ans <- yesno()
@@ -201,6 +198,9 @@ MABM_report <- function(station = NULL, year = lubridate::year(Sys.Date()),
         if (length(base_dir) == 1) {
           out_dir <- file.path(dirname(base_dir), "Annual Report")
         } else {
+          out_dir <- file.path(MABM_dir, "Annual Reports")
+          if (!dir.exists(out_dir)) dir.create(out_dir)
+          out_dir <- normalizePath(out_dir)
           if (length(base_dir) == 0) {
             warning("Matching station/route directories not found. ",
                     "Annual report output to ", shQuote(out_dir))
@@ -208,9 +208,12 @@ MABM_report <- function(station = NULL, year = lubridate::year(Sys.Date()),
             warning("Multiple matching station/route directories found. ",
                     "Annual report output to ", shQuote(out_dir))
           }
-          out_dir <- out_dir
         }
-      } else out_dir <- out_dir
+      } else {
+        out_dir <- file.path(MABM_dir, "Annual Reports")
+        if (!dir.exists(out_dir)) dir.create(out_dir)
+        out_dir <- normalizePath(out_dir)
+      }
 
       render_MABM(year = year, n_nwr = n_nwr, n_es = n_es, station = station,
                   stn_start_yr = start_yr, route_path = tmps[1],
