@@ -104,123 +104,123 @@ MABM_report <- function(station = NULL, year = format(Sys.Date(), "%Y"),
     MABMreportr:::setup_MABM_reports(export_dir = MABM_dir)
   }
 
-    # Set up temporary directory
-    tmps <- tempfile("MABM", fileext = rep(".RDS", 4))
+  # Set up temporary directory
+  tmps <- tempfile("MABM", fileext = rep(".RDS", 4))
 
-    # Get list of completed routes (stations may host >1 route)
-    routes <- readxl::read_excel(file.path(MABM_dir, "MABM_routes.xlsx"))
-    routes <- routes %>%
-        dplyr::select(station = ORGNAME,
-                      site = Site_Name,
-                      site_notes = Loc_Notes,
-                      len_mi = Rte_length,
-                      lat = Centroid_Y_Coord,
-                      lon = Centroid_X_Coord,
-                      state = State)
-    station_routes <- dplyr::select(routes, station, site)
+  # Get list of completed routes (stations may host >1 route)
+  routes <- readxl::read_excel(file.path(MABM_dir, "MABM_routes.xlsx"))
+  routes <- routes %>%
+    dplyr::select(station = ORGNAME,
+                  site = Site_Name,
+                  site_notes = Loc_Notes,
+                  len_mi = Rte_length,
+                  lat = Centroid_Y_Coord,
+                  lon = Centroid_X_Coord,
+                  state = State)
+  station_routes <- dplyr::select(routes, station, site)
 
-    # Pick a station, any station
-    menu_items <- routes$station %>% unique() %>% sort()
-    if (is.null(station)) {
-        stations <- utils::select.list(menu_items, title="Select one or more MABM stations.",
-                                      multiple = TRUE, graphics = TRUE)
-        if (length(stations) == 0) stop("You must select or provide a MABM station.")
-    } else {
-        if (!(all(station %in% routes$station))) stop("At least one unrecognized MABM station.")
-    }
+  # Pick a station, any station
+  menu_items <- routes$station %>% unique() %>% sort()
+  if (is.null(station)) {
+    station <- utils::select.list(menu_items, title="Select one or more MABM stations.",
+                                   multiple = TRUE, graphics = TRUE)
+    if (length(station) == 0) stop("You must select or provide a MABM station.")
+  } else {
+    if (!(all(station %in% routes$station))) stop("At least one unrecognized MABM station.")
+  }
 
-    ### Make the report
-    make_report <- function(station) {
-      routes <- routes[routes$station == station, ] %>% dplyr::arrange(site)
-      station <- routes$station %>% unique() %>%
-        sub("NWR", "National Wildlife Refuge", .) %>%
-        sub("SERVICES", "Services", .) %>%
-        Cap()
+  ### Make the report
+  make_report <- function(station) {
+    routes <- routes[routes$station == station, ] %>% dplyr::arrange(site)
+    station <- routes$station %>% unique() %>%
+      sub("NWR", "National Wildlife Refuge", .) %>%
+      sub("SERVICES", "Services", .) %>%
+      Cap()
 
-      # Store in temporary file
-      saveRDS(routes, file = tmps[1])
+    # Store in temporary file
+    saveRDS(routes, file = tmps[1])
 
-      survey_info <- readxl::read_excel(file.path(MABM_dir, "MABM_survey_details.xlsx"))
-      survey_info <- survey_info %>%
-        dplyr::select(site = dplyr::starts_with("Site Name"),
-                      surv_date = dplyr::starts_with("Date Start"),
-                      gps = dplyr::starts_with("GPS"),
-                      complete = dplyr::starts_with("Rt Compl"),
-                      notes = Notes) %>%
-        dplyr::filter(as.integer(format(surv_date, "%Y")) == as.integer(year))
+    survey_info <- readxl::read_excel(file.path(MABM_dir, "MABM_survey_details.xlsx"))
+    survey_info <- survey_info %>%
+      dplyr::select(site = dplyr::starts_with("Site Name"),
+                    surv_date = dplyr::starts_with("Date Start"),
+                    gps = dplyr::starts_with("GPS"),
+                    complete = dplyr::starts_with("Rt Compl"),
+                    notes = Notes) %>%
+      dplyr::filter(as.integer(format(surv_date, "%Y")) == as.integer(year))
 
-      # Pause and calculate some station summary for report
-      current_stations <- dplyr::left_join(dplyr::select(survey_info, site),
-                                           station_routes, by = "site") %>%
-        dplyr::select(station) %>% unique()
-      n_nwr <- sum(grepl("NWR", current_stations$station))
-      n_es <- sum(grepl("ECOLOG", current_stations$station))
+    # Pause and calculate some station summary for report
+    current_stations <- dplyr::left_join(dplyr::select(survey_info, site),
+                                         station_routes, by = "site") %>%
+      dplyr::select(station) %>% unique()
+    n_nwr <- sum(grepl("NWR", current_stations$station))
+    n_es <- sum(grepl("ECOLOG", current_stations$station))
 
-      # Carry on...
-      survey_info <- survey_info %>%
-        dplyr::filter(site %in% routes$site) %>%
-        dplyr::mutate(gps = as.logical(gps),
-                      complete = as.logical(complete),
-                      notes = ifelse(is.na(notes), "", notes)) %>%
-        dplyr::arrange(site, surv_date)
-      if (nrow(survey_info) == 0) stop(paste("No MABM data found at", station, "in", year))
-      # Store it
-      saveRDS(survey_info, file = tmps[2])
+    # Carry on...
+    survey_info <- survey_info %>%
+      dplyr::filter(site %in% routes$site) %>%
+      dplyr::mutate(gps = as.logical(gps),
+                    complete = as.logical(complete),
+                    notes = ifelse(is.na(notes), "", notes)) %>%
+      dplyr::arrange(site, surv_date)
+    if (nrow(survey_info) == 0) stop(paste("No MABM data found at", station, "in", year))
+    # Store it
+    saveRDS(survey_info, file = tmps[2])
 
-      # Get the call data for this station...
-      calls <- readxl::read_excel(file.path(MABM_dir, "MABM_calls.xlsx"))
-      calls <- calls %>%
-        dplyr::select(site = Site_Name,
-                      lat = LAT,
-                      lon = LONG,
-                      surv_date = dplyr::contains("Date Start"),
-                      spp = A_SP) %>%
-        dplyr::mutate(year = as.integer(format(surv_date, "%Y"))) %>%
-        dplyr::filter(site %in% routes$site & year <= year) %>%
-        dplyr::arrange(site, surv_date)
-      start_yr <- min(calls$year)
+    # Get the call data for this station...
+    calls <- readxl::read_excel(file.path(MABM_dir, "MABM_calls.xlsx"))
+    calls <- calls %>%
+      dplyr::select(site = Site_Name,
+                    lat = LAT,
+                    lon = LONG,
+                    surv_date = dplyr::contains("Date Start"),
+                    spp = A_SP) %>%
+      dplyr::mutate(year = as.integer(format(surv_date, "%Y"))) %>%
+      dplyr::filter(site %in% routes$site & year <= year) %>%
+      dplyr::arrange(site, surv_date)
+    start_yr <- min(calls$year)
 
-      #Store it
-      saveRDS(calls, tmps[3])
+    #Store it
+    saveRDS(calls, tmps[3])
 
-      # Load species code/common name lookup table and store it...
-      spp_info <- readxl::read_excel(file.path(MABM_dir, "MABM_spp_details.xlsx")) %>%
-        dplyr::rename(spp = A_SP,
-                      spp_cn = CommonName) %>%
-        dplyr::select(spp, spp_cn)
-      saveRDS(spp_info, tmps[4])
+    # Load species code/common name lookup table and store it...
+    spp_info <- readxl::read_excel(file.path(MABM_dir, "MABM_spp_details.xlsx")) %>%
+      dplyr::rename(spp = A_SP,
+                    spp_cn = CommonName) %>%
+      dplyr::select(spp, spp_cn)
+    saveRDS(spp_info, tmps[4])
 
-      # Set the output directory
-      base_dir <- NULL
-      if (distribute) {
-        base_dir <- grep(paste0(survey_info$site[1], "$"), list.dirs(MABM_dir), value = TRUE)
-        if (length(base_dir) == 1) {
-          out_dir <- file.path(dirname(base_dir), "Annual Report")
-        } else {
-          out_dir <- file.path(MABM_dir, "Annual Reports")
-          if (!dir.exists(out_dir)) dir.create(out_dir)
-          out_dir <- normalizePath(out_dir)
-          if (length(base_dir) == 0) {
-            warning("Matching station/route directories not found. ",
-                    "Annual report output to ", shQuote(out_dir))
-          } else {
-            warning("Multiple matching station/route directories found. ",
-                    "Annual report output to ", shQuote(out_dir))
-          }
-        }
+    # Set the output directory
+    base_dir <- NULL
+    if (distribute) {
+      base_dir <- grep(paste0(survey_info$site[1], "$"), list.dirs(MABM_dir), value = TRUE)
+      if (length(base_dir) == 1) {
+        out_dir <- file.path(dirname(base_dir), "Annual Report")
       } else {
         out_dir <- file.path(MABM_dir, "Annual Reports")
         if (!dir.exists(out_dir)) dir.create(out_dir)
         out_dir <- normalizePath(out_dir)
+        if (length(base_dir) == 0) {
+          warning("Matching station/route directories not found. ",
+                  "Annual report output to ", shQuote(out_dir))
+        } else {
+          warning("Multiple matching station/route directories found. ",
+                  "Annual report output to ", shQuote(out_dir))
+        }
       }
-
-      render_MABM(year = as.integer(year), n_nwr = n_nwr, n_es = n_es, station = station,
-                  stn_start_yr = start_yr, route_path = tmps[1],
-                  survey_path = tmps[2], bat_path = tmps[3], spp_path = tmps[4],
-                  out_dir = out_dir)
+    } else {
+      out_dir <- file.path(MABM_dir, "Annual Reports")
+      if (!dir.exists(out_dir)) dir.create(out_dir)
+      out_dir <- normalizePath(out_dir)
     }
 
-    invisible(lapply(stations, dplyr::failwith(NULL, make_report)))
+    render_MABM(year = as.integer(year), n_nwr = n_nwr, n_es = n_es, station = station,
+                stn_start_yr = start_yr, route_path = tmps[1],
+                survey_path = tmps[2], bat_path = tmps[3], spp_path = tmps[4],
+                out_dir = out_dir)
+  }
+
+  invisible(lapply(station, dplyr::failwith(NULL, make_report)))
 
 }
 
