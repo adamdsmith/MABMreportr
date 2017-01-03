@@ -13,7 +13,13 @@ route_header <- paste0(station_short, colon, " (", route_info$site, ") route")
 
 # `r route_header`
 
-```{r survey_log-{{route}}}
+```{r confirm_data-{{route}}, results='asis'}
+# Confirm data is available for route in requested year
+has_data <- nrow(survey_info) > 0
+if (!has_data) cat(paste0("No data reported for this route in ", params$year, "."))
+```
+
+```{r survey_log-{{route}}, eval = has_data}
 # Tally bat calls for each survey night
 surv_calls <- call_info %>% 
     dplyr::filter(surv_date %in% survey_info$surv_date) %>%
@@ -35,7 +41,7 @@ texble(surv_log,
 
 \vspace{0.25in}
 
-```{r nightly_summary-{{route}}}
+```{r nightly_summary-{{route}}, eval = has_data}
 # Tally bat calls, by species, for each survey night in reporting year
 spp_calls <- call_info %>% 
     dplyr::filter(surv_date %in% survey_info$surv_date) %>%
@@ -58,14 +64,18 @@ texble(spp_calls, digits = 2,
 
 \clearpage
 
-```{r multiyear_check-{{route}}}
+```{r multiyear_check-{{route}}, eval = has_data}
 # Check if multiple years available
 n_yrs <- dplyr::n_distinct(call_info$year)
+sds_header <- paste0("## Species detection summary (", 
+                     ifelse(n_yrs == 1, params$year, 
+                            paste(params$stn_start_yr, params$year, sep = " - ")),
+                     ")")
 ```
 
-## Species detection summary (`r ifelse(n_yrs == 1, params$year, paste(params$stn_start_yr, params$year, sep = " - "))`)
+`r if (has_data) sds_header`
 
-```{r route_spp_history-{{route}}}
+```{r route_spp_history-{{route}}, eval = has_data}
 # Tally bat calls, by species, for each year in the MABM database
 surv_ns <- call_info %>% dplyr::filter(year <= params$year) %>%
   dplyr::group_by(year) %>% 
@@ -96,7 +106,7 @@ texble(spp_table, digits = 2, longtable = TRUE,
        col_types = c("L", rep("C", 4)), tbl_float = "H") 
 ```
 
-```{r route_spp_plot-{{route}}, fig.keep = "none"}
+```{r route_spp_plot-{{route}}, fig.keep = "none", eval = has_data}
 if (n_yrs > 1) {
   ggplot2::theme_set(ggplot2::theme_classic(base_size = 15))
   
@@ -160,7 +170,7 @@ if (n_yrs > 1) {
 
 \clearpage
 
-```{r bat_locations-{{route}}}
+```{r bat_locations-{{route}}, eval = has_data}
 # Check if map is necessary
 spp_calls <- call_info %>% 
   dplyr::filter(surv_date %in% survey_info$surv_date) 
@@ -198,8 +208,7 @@ if (nrow(na.omit(spp_calls)) < 1) {
 
   route_shp <- rgdal::readOGR(shp_path, tools::file_path_sans_ext(route_shp), 
                               verbose = FALSE)
-  route_df <- as(route_shp, "data.frame") 
-  shp_coords <- sp::coordinates(route_shp) %>% as.data.frame()
+  shp_coords <- sp::coordinates(route_shp)[[1]] %>% do.call("rbind", .) %>% as.data.frame()
   ll_summary <- apply(rbind(bat_coords, 
                             stats::setNames(shp_coords, names(bat_coords))), 2, range)
   ll_diffs <- apply(ll_summary, 2, diff)
@@ -218,8 +227,7 @@ if (nrow(na.omit(spp_calls)) < 1) {
   # Deprecated panel.margin warning suppressed
   suppressWarnings(
     p <- ggmap::ggmap(bm, extent = "device", darken = 0.05) +
-      ggplot2::geom_point(data = route_df, ggplot2::aes(x = coords.x1, y = coords.x2),
-                          size = 0.5)
+      ggplot2::geom_point(data = shp_coords, ggplot2::aes(x = V1, y = V2), size = 0.5)
   )
 
   # Get the survey date legend
