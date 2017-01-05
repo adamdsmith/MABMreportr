@@ -163,7 +163,7 @@ MABM_report <- function(station = NULL, year = format(Sys.Date(), "%Y"),
                     complete = as.logical(complete),
                     notes = ifelse(is.na(notes), "", notes)) %>%
       dplyr::arrange(site, surv_date)
-    if (nrow(survey_info) == 0) stop(paste("No MABM data found at", station, "in", year))
+    if (nrow(survey_info) == 0) stop(paste0("No MABM data found at ", station, " in ", year, ".\n"))
     # Store it
     saveRDS(survey_info, file = tmps[2])
 
