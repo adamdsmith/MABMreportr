@@ -16,7 +16,7 @@ route_header <- paste0(station_short, colon, " (", route_info$site, ") route")
 ```{r confirm_data-{{route}}, results='asis'}
 # Confirm data is available for route in requested year
 has_data <- nrow(survey_info) > 0
-if (!has_data) cat(paste0("No data reported for this route in ", params$year, "."))
+if (!has_data) cat(paste0("No MABM data found for this route in ", params$year, "."))
 ```
 
 ```{r survey_log-{{route}}, eval = has_data}
@@ -188,7 +188,10 @@ shp_path <- file.path(dirname(out_dir), route_info$site)
 route_shp <- grep(pattern = "(?=.*canonical)(?=.*shp$)", list.files(shp_path),
                   perl = TRUE, value = TRUE)
 
-n_NA <- nrow(spp_calls[is.na(spp_calls$lat) | is.na(spp_calls$lon), ])
+miss_ref <- unique(c(which(is.na(spp_calls$lat)), 
+                     which(is.na(spp_calls$lon))))
+n_NA <- length(miss_ref)
+if (n_NA > 0) spp_calls <- spp_calls[-miss_ref, ]
 
 if (nrow(na.omit(spp_calls)) < 1) {
   message("No calls georeferenced or recorded. Map not created for ", 
@@ -208,14 +211,16 @@ if (nrow(na.omit(spp_calls)) < 1) {
 
   route_shp <- rgdal::readOGR(shp_path, tools::file_path_sans_ext(route_shp), 
                               verbose = FALSE)
-  shp_coords <- sp::coordinates(route_shp)[[1]] %>% do.call("rbind", .) %>% as.data.frame()
+  shp_coords <- ggplot2::fortify(route_shp)
   ll_summary <- apply(rbind(bat_coords, 
-                            stats::setNames(shp_coords, names(bat_coords))), 2, range)
+                            stats::setNames(shp_coords[, c("long", "lat")], 
+                                            names(bat_coords))), 
+                      2, range, na.rm = TRUE)
   ll_diffs <- apply(ll_summary, 2, diff)
   ll_means <- apply(ll_summary, 2, mean)
   
-  zoomlon <- ceiling(log2(360 * 2/ll_diffs[1]))
-  zoomlat <- ceiling(log2(180 * 2/ll_diffs[2]))
+  zoomlon <- floor(log2(360 * 2/ll_diffs[1]))
+  zoomlat <- floor(log2(180 * 2/ll_diffs[2]))
   zoom <- min(zoomlon, zoomlat) 
 
   suppressMessages(bm <- ggmap::get_map(c(lon = ll_means[1], lat = ll_means[2]), 
@@ -227,7 +232,8 @@ if (nrow(na.omit(spp_calls)) < 1) {
   # Deprecated panel.margin warning suppressed
   suppressWarnings(
     p <- ggmap::ggmap(bm, extent = "device", darken = 0.05) +
-      ggplot2::geom_point(data = shp_coords, ggplot2::aes(x = V1, y = V2), size = 0.5)
+      ggplot2::geom_path(data = shp_coords, ggplot2::aes(x = long, y = lat, group = group), 
+                         size = 0.5)
   )
 
   # Get the survey date legend
