@@ -5,7 +5,7 @@ Title: Function to generate annual reports for the USFWS Region 4's Mobile Acous
 Version: 0.2.1
 Date: 2016-08-27
 Authors@R: c(person("Adam", "Smith", email = "adam_d_smith@fws.gov", role = c("aut", "cre")),
-             person("David", "Richardson", role = c("ctb"), comment = "David is the primary user of the package and provided significant feedback for improvements."))
+             person("David", "Richardson", role = c("ctb"), comment = "Primary package user; provides significant feedback for improvements"))
 Maintainer: Adam D. Smith <adam_d_smith@fws.gov>
 Description: Functions to access relevant data in the MABM Access database and turn
     it into reproducible and automated annual reports for participating stations.  For
@@ -17,6 +17,7 @@ Imports:
     ggmap (>= 2.6.2),
     ggplot2 (>= 2.1),
     knitr (>= 1.14),
+    purrr (>= 0.2),
     readxl (>= 0.1.1),
     rmarkdown (>= 1.1),
     tidyr (>= 0.4.1),

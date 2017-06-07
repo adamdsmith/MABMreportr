@@ -220,7 +220,7 @@ MABM_report <- function(station = NULL, year = format(Sys.Date(), "%Y"),
                 out_dir = out_dir)
   }
 
-  invisible(lapply(station, dplyr::failwith(NULL, make_report)))
+  invisible(lapply(station, purrr::possibly(make_report, NULL)))
 
 }
 
