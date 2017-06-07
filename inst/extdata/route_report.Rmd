@@ -200,7 +200,7 @@ if (nrow(na.omit(spp_calls)) < 1) {
     message("No canonical route shapefile found for ", paste(route_info$site, "route."),
             " Map not created.") 
 } else {
-  req_pckg <- c("cowplot", "gridExtra", "rgdal", "sp", "stats")
+  req_pckg <- c("cowplot", "gridExtra", "sf")
   req_pckg <- sapply(req_pckg, requireNamespace, quietly = TRUE)
   req_pckg <- names(req_pckg)[!req_pckg]
   if (length(req_pckg) > 0) 
@@ -209,13 +209,11 @@ if (nrow(na.omit(spp_calls)) < 1) {
     install.packages(pckg)
     }))
 
-  route_shp <- rgdal::readOGR(shp_path, tools::file_path_sans_ext(route_shp), 
-                              verbose = FALSE)
-  shp_coords <- ggplot2::fortify(route_shp)
-  ll_summary <- apply(rbind(bat_coords, 
-                            stats::setNames(shp_coords[, c("long", "lat")], 
-                                            names(bat_coords))), 
-                      2, range, na.rm = TRUE)
+  route_shp <- sf::st_read(file.path(shp_path,route_shp), quiet = TRUE)
+  shp_coords <- sf::st_coordinates(route_shp) %>% 
+    as.data.frame()
+  names(shp_coords)[1:2] <- names(bat_coords)
+  ll_summary <- apply(dplyr::bind_rows(bat_coords, shp_coords[, 1:2]), 2, range, na.rm = TRUE)
   ll_diffs <- apply(ll_summary, 2, diff)
   ll_means <- apply(ll_summary, 2, mean)
   
@@ -229,12 +227,9 @@ if (nrow(na.omit(spp_calls)) < 1) {
   poss_shapes <- 21:25
   ggplot2::theme_set(ggplot2::theme_classic(base_size = 16))
   
-  # Deprecated panel.margin warning suppressed
-  suppressWarnings(
-    p <- ggmap::ggmap(bm, extent = "device", darken = 0.05) +
-      ggplot2::geom_path(data = shp_coords, ggplot2::aes(x = long, y = lat, group = group), 
-                         size = 0.5)
-  )
+  p <- ggmap::ggmap(bm, extent = "device", darken = 0.05) +
+    ggplot2::geom_path(data = shp_coords, 
+                       ggplot2::aes(x = lon, y = lat, group = L1), size = 0.5)
 
   # Get the survey date legend
   p1 <- p + ggplot2::geom_point(data = spp_calls, 
@@ -277,7 +272,7 @@ if (nrow(na.omit(spp_calls)) < 1) {
     ggplot2::scale_fill_manual("Species", values = spp_cols, guide = FALSE)
   
   # Deprecated panel.margin warning suppressed
-  suppressWarnings(p <- cowplot::ggdraw(p) + cowplot::draw_grob(leg_shape, 0, 0.96, 1, 0.04))
+  p <- cowplot::ggdraw(p) + cowplot::draw_grob(leg_shape, 0, 0.96, 1, 0.04)
 
   spp_ht <- ifelse(n_spp > 6, 0.15, 0.1)
 
