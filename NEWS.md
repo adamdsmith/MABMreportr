@@ -1,3 +1,7 @@
+# MABMreportr 0.2.1
+
+* Canonical shapefiles now loaded as `sf`; updated package dependencies as necessary
+
 # MABMreportr 0.2
 
 * Several substantial functionality improvements, including:
