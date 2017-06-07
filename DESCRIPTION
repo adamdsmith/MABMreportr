@@ -2,7 +2,7 @@ Package: MABMreportr
 Type: Package
 Title: Function to generate annual reports for the USFWS Region 4's Mobile Acoustical Bat Monitoring
     (MABM) Program
-Version: 0.2
+Version: 0.2.1
 Date: 2016-08-27
 Authors@R: c(person("Adam", "Smith", email = "adam_d_smith@fws.gov", role = c("aut", "cre")),
              person("David", "Richardson", role = c("ctb"), comment = "David is the primary user of the package and provided significant feedback for improvements."))
@@ -15,21 +15,18 @@ Depends:
 Imports:
     dplyr (>= 0.5.0),
     ggmap (>= 2.6.2),
-    ggplot2 (>= 2.1.0.9001),
+    ggplot2 (>= 2.1),
     knitr (>= 1.14),
     readxl (>= 0.1.1),
     rmarkdown (>= 1.1),
-    sp (>= 1.2.3),
     tidyr (>= 0.4.1),
     utils
 Remotes:
-    hadley/ggplot2,
     dkahle/ggmap
 Suggests:
     cowplot (>= 0.6.3),
     gridExtra (>= 2.2.1),
-    rgdal (>= 1.1-10),
-    stats (>= 3.2.5)
+    sf (>= 0.4-3)
 License: CC0
 Copyright: This software is in the public domain because it contains materials
     that originally came from the United States Fish & Wildlife Service, an agency
