@@ -13,6 +13,7 @@ Description: Functions to access relevant data in the MABM Access database and t
 Depends:
     R (>= 3.2)
 Imports:
+    curl (>= 2.6),
     dplyr (>= 0.5.0),
     ggmap (>= 2.6.2),
     ggplot2 (>= 2.1),

@@ -171,130 +171,137 @@ if (n_yrs > 1) {
 \clearpage
 
 ```{r bat_locations-{{route}}, eval = has_data}
-# Check if map is necessary
-spp_calls <- call_info %>% 
-  dplyr::filter(surv_date %in% survey_info$surv_date) 
+# Check for internet connection
+web <- curl::has_internet()
 
-# Pause and format survey dates for nicer plot
-date_levs <- format(unique(sort(spp_calls$surv_date)),
-                    format = "%d %b")
-spp_calls <- spp_calls %>%
-  dplyr::mutate(surv_date = factor(format(surv_date, format = "%d %b"),
-                                   levels = date_levs))
-bat_coords <- spp_calls[, c("lon", "lat")]
-
-# Find data and GIS directory
-shp_path <- file.path(dirname(out_dir), route_info$site)
-route_shp <- grep(pattern = "(?=.*canonical)(?=.*shp$)", list.files(shp_path),
-                  perl = TRUE, value = TRUE)
-
-miss_ref <- unique(c(which(is.na(spp_calls$lat)), 
-                     which(is.na(spp_calls$lon))))
-n_NA <- length(miss_ref)
-if (n_NA > 0) spp_calls <- spp_calls[-miss_ref, ]
-
-if (nrow(na.omit(spp_calls)) < 1) {
-  message("No calls georeferenced or recorded. Map not created for ", 
-          paste(route_info$site, "route."))
-} else if (length(route_shp) == 0) {
+if (!web) {
+  message("No internet connection detected. Map not created.")
+} else {
+  # Check if map is necessary
+  spp_calls <- call_info %>% 
+    dplyr::filter(surv_date %in% survey_info$surv_date) 
+  
+  # Pause and format survey dates for nicer plot
+  date_levs <- format(unique(sort(spp_calls$surv_date)),
+                      format = "%d %b")
+  spp_calls <- spp_calls %>%
+    dplyr::mutate(surv_date = factor(format(surv_date, format = "%d %b"),
+                                     levels = date_levs))
+  bat_coords <- spp_calls[, c("lon", "lat")]
+  
+  # Find data and GIS directory
+  shp_path <- file.path(dirname(out_dir), route_info$site)
+  route_shp <- grep(pattern = "(?=.*canonical)(?=.*shp$)", list.files(shp_path),
+                    perl = TRUE, value = TRUE)
+  
+  miss_ref <- unique(c(which(is.na(spp_calls$lat)), 
+                       which(is.na(spp_calls$lon))))
+  n_NA <- length(miss_ref)
+  if (n_NA > 0) spp_calls <- spp_calls[-miss_ref, ]
+  
+  if (nrow(na.omit(spp_calls)) < 1) {
+    message("No calls georeferenced or recorded. Map not created for ", 
+            paste(route_info$site, "route."))
+  } else if (length(route_shp) == 0) {
     message("No canonical route shapefile found for ", paste(route_info$site, "route."),
             " Map not created.") 
-} else {
-  req_pckg <- c("cowplot", "gridExtra", "sf")
-  req_pckg <- sapply(req_pckg, requireNamespace, quietly = TRUE)
-  req_pckg <- names(req_pckg)[!req_pckg]
-  if (length(req_pckg) > 0) 
-    invisible(lapply(req_pckg, function(pckg) {
-      message("The ", shQuote(pckg), " package is needed and will be installed")
-    install.packages(pckg)
-    }))
-
-  route_shp <- sf::st_read(file.path(shp_path,route_shp), quiet = TRUE)
-  shp_coords <- sf::st_coordinates(route_shp) %>% 
-    as.data.frame()
-  names(shp_coords)[1:2] <- names(bat_coords)
-  ll_summary <- apply(dplyr::bind_rows(bat_coords, shp_coords[, 1:2]), 2, range, na.rm = TRUE)
-  ll_diffs <- apply(ll_summary, 2, diff)
-  ll_means <- apply(ll_summary, 2, mean)
-  
-  zoomlon <- floor(log2(360 * 2/ll_diffs[1]))
-  zoomlat <- floor(log2(180 * 2/ll_diffs[2]))
-  zoom <- min(zoomlon, zoomlat) 
-
-  suppressMessages(bm <- ggmap::get_map(c(lon = ll_means[1], lat = ll_means[2]), 
-                       maptype = "terrain", zoom = zoom,
-                       messaging = FALSE))
-  poss_shapes <- 21:25
-  ggplot2::theme_set(ggplot2::theme_classic(base_size = 16))
-  
-  p <- ggmap::ggmap(bm, extent = "device", darken = 0.05) +
-    ggplot2::geom_path(data = shp_coords, 
-                       ggplot2::aes(x = lon, y = lat, group = L1), size = 0.5)
-
-  # Get the survey date legend
-  p1 <- p + ggplot2::geom_point(data = spp_calls, 
-                                ggplot2::aes(x = lon, y = lat, shape = surv_date),
-                                size = 2, color = "black") +
-    ggplot2::scale_shape_manual("Survey date:",
-                       values = poss_shapes[1:length(unique(spp_calls$surv_date))],
-                       guide = ggplot2::guide_legend(direction = "horizontal")) +
-    ggplot2::theme(legend.title = ggplot2::element_text(size = 12, hjust = 1),
-          legend.text = ggplot2::element_text(size = 11, hjust = 0),
-          legend.background = ggplot2::element_rect(fill = scales::alpha("white", 0.5)))
-  
-  leg_shape <- cowplot::get_legend(p1)
-  
-  # Get the species legend
-  n_spp <- dplyr::n_distinct(spp_calls$spp)
-  cols <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", 
-            "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99", "#B15928")
-  spp_cols <- cols[1:n_spp]
-
-  p2 <- p + 
-    ggplot2::geom_point(data = spp_calls, 
-                               ggplot2::aes(x = lon, y = lat, fill = spp), shape = 21,
-                               size = 2) +
-    ggplot2::scale_fill_manual("Species", values = spp_cols,
-                                guide = ggplot2::guide_legend(title.hjust =0.5,
-                                                              title.position = "top",
-                                                              nrow = ifelse(n_spp > 6, 2, 1),
-                                                              byrow = TRUE))
-  spp_leg <- cowplot::get_legend(p2)
-  
-  # Construct final plot
-  p <- p +
-    ggplot2::geom_point(data = spp_calls, 
-                        ggplot2::aes(x = lon, y = lat, fill = spp, 
-                                     shape = surv_date), size = 2) +
-    ggplot2::scale_shape_manual("Survey date",
-                                values = poss_shapes[1:length(unique(spp_calls$surv_date))],
-                                guide = FALSE) +
-    ggplot2::scale_fill_manual("Species", values = spp_cols, guide = FALSE)
-  
-  # Deprecated panel.margin warning suppressed
-  p <- cowplot::ggdraw(p) + cowplot::draw_grob(leg_shape, 0, 0.96, 1, 0.04)
-
-  spp_ht <- ifelse(n_spp > 6, 0.15, 0.1)
-
-  # Save to temp file
-  tmp_fig <- tempfile(fileext = ".pdf")
-  pdf(tmp_fig, width = 6.5, height = 6.5)
-  gridExtra::grid.arrange(spp_leg, p, nrow = 2, 
-                          heights = c(spp_ht, 1 - spp_ht))
-  invisible(dev.off())
+  } else {
+    req_pckg <- c("cowplot", "gridExtra", "sf")
+    req_pckg <- sapply(req_pckg, requireNamespace, quietly = TRUE)
+    req_pckg <- names(req_pckg)[!req_pckg]
+    if (length(req_pckg) > 0) 
+      invisible(lapply(req_pckg, function(pckg) {
+        message("The ", shQuote(pckg), " package is needed and will be installed")
+        install.packages(pckg)
+      }))
     
-  # Convert slashes to LaTeX can deal with them...
-  tmp_fig <- normalizePath(tmp_fig, winslash = "/")
+    route_shp <- sf::st_read(file.path(shp_path,route_shp), quiet = TRUE)
+    shp_coords <- sf::st_coordinates(route_shp) %>% 
+      as.data.frame()
+    names(shp_coords)[1:2] <- names(bat_coords)
+    ll_summary <- apply(dplyr::bind_rows(bat_coords, shp_coords[, 1:2]), 2, range, na.rm = TRUE)
+    ll_diffs <- apply(ll_summary, 2, diff)
+    ll_means <- apply(ll_summary, 2, mean)
     
-  res <- paste(c("\\begin{figure}[H]",
-                 "\\centering",
-                 paste0("\\includegraphics[width = 6.5in, height = 6.5in]{", tmp_fig, "}"),
-                 paste0("\\caption{", year, " georeferenced bat detections superimposed on the ", route_info$site, " survey route.  ",
-                        if (n_NA == 0) "All recorded calls are represented.  ",
-                        if (n_NA > 0) paste(n_NA, "calls are not represented due to missing spatial information.  "),
-                        "Total route length = ", route_info$len_mi, " miles.}"),
-                 "\\end{figure}"), collapse = "\n")
-  structure(res, format = "latex", class = "knitr_kable")
+    zoomlon <- floor(log2(360 * 2/ll_diffs[1]))
+    zoomlat <- floor(log2(180 * 2/ll_diffs[2]))
+    zoom <- min(zoomlon, zoomlat) 
+    
+    suppressMessages(bm <- ggmap::get_map(c(lon = ll_means[1], lat = ll_means[2]), 
+                                          maptype = "terrain", zoom = zoom,
+                                          messaging = FALSE))
+    poss_shapes <- 21:25
+    ggplot2::theme_set(ggplot2::theme_classic(base_size = 16))
+    
+    p <- ggmap::ggmap(bm, extent = "device", darken = 0.05) +
+      ggplot2::geom_path(data = shp_coords, 
+                         ggplot2::aes(x = lon, y = lat, group = L1), size = 0.5)
+    
+    # Get the survey date legend
+    p1 <- p + ggplot2::geom_point(data = spp_calls, 
+                                  ggplot2::aes(x = lon, y = lat, shape = surv_date),
+                                  size = 2, color = "black") +
+      ggplot2::scale_shape_manual("Survey date:",
+                                  values = poss_shapes[1:length(unique(spp_calls$surv_date))],
+                                  guide = ggplot2::guide_legend(direction = "horizontal")) +
+      ggplot2::theme(legend.title = ggplot2::element_text(size = 12, hjust = 1),
+                     legend.text = ggplot2::element_text(size = 11, hjust = 0),
+                     legend.background = ggplot2::element_rect(fill = scales::alpha("white", 0.5)))
+    
+    leg_shape <- cowplot::get_legend(p1)
+    
+    # Get the species legend
+    n_spp <- dplyr::n_distinct(spp_calls$spp)
+    cols <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", 
+              "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99", "#B15928")
+    spp_cols <- cols[1:n_spp]
+    
+    p2 <- p + 
+      ggplot2::geom_point(data = spp_calls, 
+                          ggplot2::aes(x = lon, y = lat, fill = spp), shape = 21,
+                          size = 2) +
+      ggplot2::scale_fill_manual("Species", values = spp_cols,
+                                 guide = ggplot2::guide_legend(title.hjust =0.5,
+                                                               title.position = "top",
+                                                               nrow = ifelse(n_spp > 6, 2, 1),
+                                                               byrow = TRUE))
+    spp_leg <- cowplot::get_legend(p2)
+    
+    # Construct final plot
+    p <- p +
+      ggplot2::geom_point(data = spp_calls, 
+                          ggplot2::aes(x = lon, y = lat, fill = spp, 
+                                       shape = surv_date), size = 2) +
+      ggplot2::scale_shape_manual("Survey date",
+                                  values = poss_shapes[1:length(unique(spp_calls$surv_date))],
+                                  guide = FALSE) +
+      ggplot2::scale_fill_manual("Species", values = spp_cols, guide = FALSE)
+    
+    p <- cowplot::ggdraw(p) + cowplot::draw_grob(leg_shape, 0, 0.96, 1, 0.04)
+    
+    spp_ht <- ifelse(n_spp > 6, 0.15, 0.1)
+    
+    # Save to temp file
+    tmp_fig <- tempfile(fileext = ".pdf")
+    pdf(tmp_fig, width = 6.5, height = 6.5)
+    gridExtra::grid.arrange(spp_leg, p, nrow = 2, 
+                            heights = c(spp_ht, 1 - spp_ht))
+    invisible(dev.off())
+    
+    # Convert slashes to LaTeX can deal with them...
+    tmp_fig <- normalizePath(tmp_fig, winslash = "/")
+    
+    res <- paste(c("\\begin{figure}[H]",
+                   "\\centering",
+                   paste0("\\includegraphics[width = 6.5in, height = 6.5in]{", tmp_fig, "}"),
+                   paste0("\\caption{", year, " georeferenced bat detections superimposed on the ",
+                          route_info$site, " survey route.  ",
+                          if (n_NA == 0) "All recorded calls are represented.  ",
+                          if (n_NA > 0) paste(n_NA, "calls are not represented due to missing spatial information.  "),
+                          "Total route length = ", route_info$len_mi, " miles.}"),
+                   "\\end{figure}"), collapse = "\n")
+    structure(res, format = "latex", class = "knitr_kable")
+  }
 }
 ```
 
