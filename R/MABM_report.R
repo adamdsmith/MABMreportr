@@ -85,7 +85,7 @@
 #'  If so, it is named similarly to, and exported with, the report *.pdf
 #' @export
 
-MABM_report <- function(station = NULL, year = format(Sys.Date(), "%Y"),
+MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y")),
                         MABM_dir = NULL, update = FALSE, distribute = TRUE,
                         interactive = TRUE) {
 
@@ -152,7 +152,7 @@ MABM_report <- function(station = NULL, year = format(Sys.Date(), "%Y"),
                     gps = dplyr::starts_with("GPS"),
                     complete = dplyr::starts_with("Rt Compl"),
                     notes = Notes) %>%
-      dplyr::filter(as.integer(format(surv_date, "%Y")) == as.integer(year))
+      dplyr::filter(as.integer(format(surv_date, "%Y")) == year)
 
     # Pause and calculate some station summary for report
     current_stations <- dplyr::left_join(dplyr::select(survey_info, site),
@@ -219,7 +219,7 @@ MABM_report <- function(station = NULL, year = format(Sys.Date(), "%Y"),
       out_dir <- normalizePath(out_dir)
     }
 
-    render_MABM(year = as.integer(year), n_nwr = n_nwr, n_es = n_es, station = station,
+    render_MABM(year = year, n_nwr = n_nwr, n_es = n_es, station = station,
                 stn_start_yr = start_yr, route_path = tmps[1],
                 survey_path = tmps[2], bat_path = tmps[3], spp_path = tmps[4],
                 out_dir = out_dir)
