@@ -148,7 +148,7 @@ yesno <- function() {
   return(tolower(ans))
 }
 
-interactive_MABM <- function(routes, calls, spp_info, yr, out_dir) {
+interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
 
   req_pckg <- c("leaflet", "htmlwidgets", "htmltools")
   req_pckg <- sapply(req_pckg, requireNamespace, quietly = TRUE)
@@ -174,8 +174,8 @@ interactive_MABM <- function(routes, calls, spp_info, yr, out_dir) {
   for (i in routes$site) {
 
     i_calls <- calls %>%
-      left_join(spp_info, by = "spp") %>%
-      filter(site == i, year == yr,
+      dplyr::left_join(spp_info, by = "spp") %>%
+      dplyr::filter(site == i, year == yr,
              !is.na(lat), !is.na(lon))
 
     shp_path <- file.path(dirname(out_dir), i)
@@ -207,7 +207,7 @@ interactive_MABM <- function(routes, calls, spp_info, yr, out_dir) {
     for (j in seq_along(surv_dates)) {
       grp <- groups[j]; dt <- surv_dates[j]
       p <- p %>%
-        leaflet::addMarkers(data = subset(i_calls, surv_date == dt),
+        leaflet::addMarkers(data = dplyr::filter(i_calls, surv_date == dt),
                    ~lon, ~lat, group = grp,
                    options = leaflet::markerOptions(riseOnHover = TRUE),
                    label = ~paste0(spp, ": ", spp_cn),
@@ -226,12 +226,12 @@ interactive_MABM <- function(routes, calls, spp_info, yr, out_dir) {
       gsub("ecological services", "ES", ., ignore.case = TRUE)
 
     out_file <- file.path(out_dir,
-                          paste("MABM", i, year, "interactive.html", sep = "_"))
+                          paste("MABM", i, yr, "interactive.html", sep = "_"))
 
     htmlwidgets::saveWidget(p, file = out_file)
     unlink(sub(".html", "_files", out_file), recursive = TRUE)
 
-    message(paste(strwrap(paste("Created interactive bat detection map for", year,
+    message(paste(strwrap(paste("Created interactive bat detection map for", yr,
             "survey(s) along", station_short, "-", i, "route:\n",
             tools::file_path_as_absolute(out_file))), collapse = "\n"), "\n")
 

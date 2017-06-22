@@ -134,7 +134,7 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
   }
 
   ### Make the report
-  make_report <- function(station) {
+  make_report <- function(station, interactive) {
     message("Processing report for ", station, "\n")
     routes <- routes[routes$station == station, ] %>% dplyr::arrange(site)
     station <- routes$station %>% unique() %>%
@@ -224,7 +224,7 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
                 survey_path = tmps[2], bat_path = tmps[3], spp_path = tmps[4],
                 out_dir = out_dir)
 
-    if (interactive) interactive_MABM(routes, calls, spp_info, year, out_dir)
+    if (interactive) interactive_MABM(station, routes, calls, spp_info, year, out_dir)
 
   }
 
