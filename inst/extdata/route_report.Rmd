@@ -175,7 +175,7 @@ if (n_yrs > 1) {
 web <- curl::has_internet()
 
 if (!web) {
-  message("No internet connection detected. Map not created.")
+  message("No internet connection detected. Map not created.\n")
 } else {
   # Check if map is necessary
   spp_calls <- call_info %>% 
@@ -201,18 +201,18 @@ if (!web) {
   
   if (nrow(na.omit(spp_calls)) < 1) {
     message("No calls georeferenced or recorded. Map not created for ", 
-            paste(route_info$site, "route."))
+            paste(route_info$site, "route."), "\n")
   } else if (length(route_shp) == 0) {
     message("No canonical route shapefile found for ", paste(route_info$site, "route."),
-            " Map not created.") 
+            " Map not created.\n") 
   } else {
     req_pckg <- c("cowplot", "gridExtra", "sf")
     req_pckg <- sapply(req_pckg, requireNamespace, quietly = TRUE)
     req_pckg <- names(req_pckg)[!req_pckg]
     if (length(req_pckg) > 0) 
       invisible(lapply(req_pckg, function(pckg) {
-        message("The ", shQuote(pckg), " package is needed and will be installed")
-        install.packages(pckg)
+        message("The ", shQuote(pckg), " package is needed and will be installed.\n")
+        install.packages(pckg, verbose = FALSE)
       }))
     
     route_shp <- sf::st_read(file.path(shp_path,route_shp), quiet = TRUE)
