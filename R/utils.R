@@ -225,15 +225,16 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
     station_short <- station %>% gsub("national wildlife refuge", "NWR", ., ignore.case = TRUE) %>%
       gsub("ecological services", "ES", ., ignore.case = TRUE)
 
-    out_file <- file.path(out_dir,
-                          paste("MABM", i, yr, "interactive.html", sep = "_"))
+    out_fn <- paste("MABM", i, yr, "interactive.html", sep = "_")
 
-    htmlwidgets::saveWidget(p, file = out_file)
-    #unlink(sub(".html", "_files", out_file), recursive = TRUE)
+    htmlwidgets::saveWidget(p, file = out_fn)
+
+    # Move it
+    file.rename(out_fn, file.path(out_dir, out_fn))
 
     message(paste(strwrap(paste("Created interactive bat detection map for", yr,
             "survey(s) along", station_short, "-", i, "route:\n",
-            tools::file_path_as_absolute(out_file))), collapse = "\n"), "\n")
+            tools::file_path_as_absolute(file.path(out_dir, out_fn)))), collapse = "\n"), "\n")
 
   }
 
