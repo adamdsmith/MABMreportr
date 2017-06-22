@@ -229,7 +229,7 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
                           paste("MABM", i, yr, "interactive.html", sep = "_"))
 
     htmlwidgets::saveWidget(p, file = out_file)
-    unlink(sub(".html", "_files", out_file), recursive = TRUE)
+    #unlink(sub(".html", "_files", out_file), recursive = TRUE)
 
     message(paste(strwrap(paste("Created interactive bat detection map for", yr,
             "survey(s) along", station_short, "-", i, "route:\n",
