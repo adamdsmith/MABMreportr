@@ -1,3 +1,7 @@
+# MABMreportr 0.3
+
+* Optionally creates an interactive HTML (leaflet) map of detections for each route along with the final report
+
 # MABMreportr 0.2.1
 
 * Canonical shapefiles now loaded as `sf`; updated package dependencies as necessary

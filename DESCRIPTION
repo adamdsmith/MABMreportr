@@ -2,7 +2,7 @@ Package: MABMreportr
 Type: Package
 Title: Function to generate annual reports for the USFWS Region 4's Mobile Acoustical Bat Monitoring
     (MABM) Program
-Version: 0.2.1
+Version: 0.3
 Date: 2016-08-27
 Authors@R: c(person("Adam", "Smith", email = "adam_d_smith@fws.gov", role = c("aut", "cre")),
              person("David", "Richardson", role = c("ctb"), comment = "Primary package user; provides significant feedback for improvements"))
@@ -42,4 +42,4 @@ Copyright: This software is in the public domain because it contains materials
 LazyData: TRUE
 URL: https://github.com/adamdsmith/MABMreportr
 BugReports: https://github.com/adamdsmith/MABMreportr/issues
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
