@@ -18,7 +18,6 @@ Imports:
     ggmap (>= 2.6.2),
     ggplot2 (>= 2.1),
     knitr (>= 1.14),
-    purrr (>= 0.2),
     readxl (>= 0.1.1),
     rmarkdown (>= 1.1),
     tidyr (>= 0.4.1),

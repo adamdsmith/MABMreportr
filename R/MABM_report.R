@@ -228,7 +228,7 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
 
   }
 
-  invisible(lapply(station, purrr::possibly(make_report, NULL)))
+  invisible(lapply(station, function(stn) make_report(stn, interactive)))
 
 }
 
