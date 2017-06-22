@@ -8,4 +8,3 @@
 \description{
 See the \href{https://github.com/adamdsmith/MABMreportr}{README} on GitHub
 }
-

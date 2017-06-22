@@ -5,7 +5,8 @@
 \title{MABM annual report creation.}
 \usage{
 MABM_report(station = NULL, year = format(Sys.Date(), "\%Y"),
-  MABM_dir = NULL, update = FALSE, distribute = TRUE)
+  MABM_dir = NULL, update = FALSE, distribute = TRUE,
+  interactive = TRUE)
 }
 \arguments{
 \item{station}{character string indicating the MABM station (e.g., refuge, ES office) for
@@ -29,6 +30,10 @@ output report in an 'Annual Report' directory within the base directory for each
 if located. To work properly, a specific directory hierarchy is expected (see Details).
 If `distribute` = FALSE or distribute attempt fails (see Details), the output is placed
 in an 'Annual Report' directory beneath \code{MABM_dir}.}
+
+\item{interactive}{logical (default = TRUE) indicating whether to output a standalone
+interactive leaflet map (*.html file) of bat detections along a route in a given year.
+If so, it is named similarly to, and exported with, the report *.pdf}
 }
 \description{
 This function generates an annual report for one or more MABM stations for, by default,

@@ -80,10 +80,14 @@
 #'  if located. To work properly, a specific directory hierarchy is expected (see Details).
 #'  If `distribute` = FALSE or distribute attempt fails (see Details), the output is placed
 #'  in an 'Annual Report' directory beneath \code{MABM_dir}.
+#' @param interactive logical (default = TRUE) indicating whether to output a standalone
+#'  interactive leaflet map (*.html file) of bat detections along a route in a given year.
+#'  If so, it is named similarly to, and exported with, the report *.pdf
 #' @export
 
 MABM_report <- function(station = NULL, year = format(Sys.Date(), "%Y"),
-                        MABM_dir = NULL, update = FALSE, distribute = TRUE) {
+                        MABM_dir = NULL, update = FALSE, distribute = TRUE,
+                        interactive = TRUE) {
 
   if (is.null(MABM_dir)) {
     ans <- yesno()
@@ -219,6 +223,9 @@ MABM_report <- function(station = NULL, year = format(Sys.Date(), "%Y"),
                 stn_start_yr = start_yr, route_path = tmps[1],
                 survey_path = tmps[2], bat_path = tmps[3], spp_path = tmps[4],
                 out_dir = out_dir)
+
+    if (interactive) interactive_MABM(routes, calls, spp_info, year, out_dir)
+
   }
 
   invisible(lapply(station, purrr::possibly(make_report, NULL)))
