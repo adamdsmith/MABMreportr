@@ -24,6 +24,7 @@ Imports:
     utils
 Remotes:
     dkahle/ggmap,
+    adamdsmith/leaflet,
     adamdsmith/MABM
 Suggests:
     cowplot (>= 0.6.3),
