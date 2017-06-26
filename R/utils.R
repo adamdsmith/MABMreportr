@@ -150,7 +150,7 @@ yesno <- function() {
 
 interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
 
-  req_pckg <- c("leaflet", "htmlwidgets", "htmltools")
+  req_pckg <- c("htmlwidgets", "htmltools")
   req_pckg <- sapply(req_pckg, requireNamespace, quietly = TRUE)
   req_pckg <- names(req_pckg)[!req_pckg]
   if (length(req_pckg) > 0)
@@ -214,16 +214,22 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
                    icon = ~batIcons[spp])
     }
 
+    station_short <- station %>% gsub("national wildlife refuge", "NWR", ., ignore.case = TRUE) %>%
+      gsub("ecological services", "ES", ., ignore.case = TRUE)
+
     # Add species legend and layer control
     p <- p %>%
       leaflet::addLegend("topleft", pal = sppPal, values = i_calls$spp,
-                title = "Species", opacity = 1) %>%
+                         title = paste(paste(strwrap(station_short, 16),
+                                             collapse = "<br>&nbsp;"),
+                                       paste("Route:", i),
+                                       paste("Year:", yr), sep = "<br>"),
+                         opacity = 1) %>%
       leaflet::addLayersControl(baseGroups = c("Terrain", "Aerial"),
-                       overlayGroups = groups,
-                       options = leaflet::layersControlOptions(collapsed = FALSE))
-
-    station_short <- station %>% gsub("national wildlife refuge", "NWR", ., ignore.case = TRUE) %>%
-      gsub("ecological services", "ES", ., ignore.case = TRUE)
+                                overlayGroups = groups,
+                                position = "topleft",
+                                options = leaflet::layersControlOptions(collapsed = FALSE)) %>%
+      leaflet::moveZoomControl()
 
     out_tmp <- tempdir()
     out_fn <- paste("MABM", i, yr, "interactive.html", sep = "_")
