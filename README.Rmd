@@ -33,9 +33,10 @@ The MABMreportr package require several programs to function properly (or at all
 2.  **[Rtools](https://cran.r-project.org/bin/windows/Rtools/)**
 3.  **Full TeX installation**: Use the [basic MiKTeX installer](http://miktex.org/download) that matches your system architecture (e.g., 64-bit) on Windows, [MacTeX](https://tug.org/mactex/mactex-download.html) on Mac OS X, and [TeXLive](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-140003) for Linux.  Notice that neither `MABMreportr`, nor the associated [`MABM` package](https://github.com/adamdsmith/MABM) has been tested outside of 64-bit Windows 7.
 4.  **pandoc**: If you're using a relatively recent version of [RStudio](https://www.rstudio.com/products/rstudio/download/preview/), pandoc is included.  Using `MABMreportr` outside of RStudio will require a recent version of [pandoc](http://pandoc.org/installing.html) (>= 1.12.3).
-5.  Microsoft Access
+5.  **Microsoft Access**
+6.  **[PDFtk Server](https://www.pdflabs.com/tools/pdftk-server/)** 
 
-R, Rtools, RStudio, and Microsoft Access (and possibly the TeX installation) will require administrative priveleges but the installation of packages after this initial install will not.  It's likely Microsoft Access is already installed on your DOI computer.
+R, Rtools, RStudio, Microsoft Access, and PDFtk Server (and possibly the TeX installation) will require administrative priveleges but the installation of packages after this initial install will not.  It's likely Microsoft Access is already installed on your DOI computer.  `MABMreportr` is tested and works only on PCs running Microsoft Windows.
 
 You also need an up-to-date, local copy of the MABM database.  Currently, this applies to two people in the world, but it will be easy to provide a remotely accessible location for this database down the road.
 
@@ -95,3 +96,5 @@ The progress of report generation is reported to the console.  Of course success
 ![Report generation progress](./README-figs/reports_complete.png)
 
 By default (`distribute = TRUE`), the function looks for a particular file hierarchy in the directory specified initially to contain (or in which to output) MABM exports and attempts to place the output report in an 'Annual Report' directory within the base directory for each MABM station, if it can be located. Again, to work properly, this requires a specific directory hierarchy.  Please see the Details section of `?MABM_report` for more information.  This default behavior can be overridden by setting `update = FALSE` and specifying an output location using the `out_dir` argument.  See `?MABM_report` form additional information.
+
+Likewise, by default (`interactive = TRUE`), the function generates an interactive `leaflet` map of georeferenced bat detections for each survey that occurred along each route associated with that station in the requested year.  If the PDFtk Server program is found on your machine, these `html` files will be attached to the final report `pdf` and can be accessed via the "Attachments" tab in Adobe Reader.  Double-clicking will open the interactive map in your default browser; the files are self-contained and can be accessed off-line.  If PDFtk is not found, the files are retained as self-contained `html` files next to the final report `pdf`.
