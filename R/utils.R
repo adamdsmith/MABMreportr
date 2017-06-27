@@ -118,5 +118,16 @@ yesno <- function() {
   return(tolower(ans))
 }
 
-
+find_pdftk <- function() {
+  pdftk <- grep("pdftk", MABM:::two_deep("C:/"), ignore.case = TRUE, value = TRUE)
+  if (length(pdftk) == 0) return(character(0))
+  pdftk <- paste(pdftk, "bin", "pdftk.exe", sep = "/")
+  pdftk
 }
+
+shorten_station <- function(station) {
+  station %>% gsub("national wildlife refuge", "NWR", ., ignore.case = TRUE) %>%
+  gsub("ecological services", "ES", ., ignore.case = TRUE) %>%
+  gsub(" |\\.", "", .)
+}
+
