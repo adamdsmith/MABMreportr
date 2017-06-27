@@ -1,0 +1,98 @@
+interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
+
+  req_pckg <- c("htmlwidgets", "htmltools")
+  req_pckg <- sapply(req_pckg, requireNamespace, quietly = TRUE)
+  req_pckg <- names(req_pckg)[!req_pckg]
+  if (length(req_pckg) > 0)
+    invisible(lapply(req_pckg, function(pckg) {
+      message("The ", shQuote(pckg), " package is needed and will be installed")
+      install.packages(pckg)
+    }))
+
+  #Create a custom color scale to consistently display species
+  bat_fills <- c("orange3", "orange3", "sienna", "red2", "forestgreen", "forestgreen",
+                 "gray40", "gray40", "gray40", "gray40", "gray40", "gray40", "royalblue4",
+                 "gold", "white")
+  names(bat_fills) <- c("CORA", "COTO", "EPFU", "LABO", "LACI", "LANO", "MYAU",
+                        "MYGR", "MYLE", "MYLU", "MYSE", "MYSO", "NYHU", "PESU",
+                        "UNKN")
+  sppPal <- leaflet::colorFactor(palette = bat_fills, domain = names(bat_fills))
+
+  # Make bat icon list
+  batIcons <- MABM:::makeBatIconList()
+
+  for (i in routes$site) {
+
+    i_calls <- calls %>%
+      dplyr::left_join(spp_info, by = "spp") %>%
+      dplyr::filter(site == i, year == yr,
+                    !is.na(lat), !is.na(lon))
+
+    shp_path <- file.path(dirname(out_dir), i)
+    route_shp <- grep(pattern = "(?=.*canonical)(?=.*shp$)", list.files(shp_path),
+                      perl = TRUE, value = TRUE)
+
+    if (nrow(i_calls) == 0) {
+      message("No calls georeferenced or recorded. Map not created for ", i, " route.")
+    } else if (length(route_shp) == 0) {
+      message("No canonical route shapefile found. Map not created for ", i, " route.")
+    }
+
+    route_shp <- sf::st_read(file.path(shp_path,route_shp), quiet = TRUE) %>%
+      as("Spatial")
+
+    p <- leaflet::leaflet() %>%
+      # Base map group
+      leaflet::addTiles("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+                        group = "Terrain") %>%
+      leaflet::addTiles("http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                        group = "Aerial") %>%
+      # Add canonical route
+      leaflet::addPolylines(data = route_shp, color = "#B2B2B2", opacity = 1)
+
+    # Add georeferenced bat detections by survey date
+    surv_dates <- unique(i_calls$surv_date)
+    groups <- format(surv_dates, format = "%d %B")
+
+    for (j in seq_along(surv_dates)) {
+      grp <- groups[j]; dt <- surv_dates[j]
+      p <- p %>%
+        leaflet::addMarkers(data = dplyr::filter(i_calls, surv_date == dt),
+                            ~lon, ~lat, group = grp,
+                            options = leaflet::markerOptions(riseOnHover = TRUE),
+                            label = ~paste0(spp, ": ", spp_cn),
+                            icon = ~batIcons[spp])
+    }
+
+    station_short <- station %>% gsub("national wildlife refuge", "NWR", ., ignore.case = TRUE) %>%
+      gsub("ecological services", "ES", ., ignore.case = TRUE)
+
+    # Add species legend and layer control
+    p <- p %>%
+      leaflet::addLegend("topleft", pal = sppPal, values = i_calls$spp,
+                         title = paste(paste(strwrap(station_short, 16),
+                                             collapse = "<br>&nbsp;"),
+                                       paste("Route:", i),
+                                       paste("Year:", yr), sep = "<br>"),
+                         opacity = 1) %>%
+      leaflet::addLayersControl(baseGroups = c("Terrain", "Aerial"),
+                                overlayGroups = groups,
+                                position = "topleft",
+                                options = leaflet::layersControlOptions(collapsed = FALSE)) %>%
+      leaflet::moveZoomControl()
+
+    out_tmp <- tempdir()
+    out_fn <- paste("MABM", i, yr, "interactive.html", sep = "_")
+
+    htmlwidgets::saveWidget(p, file = file.path(out_tmp, out_fn))
+
+    # Move it
+    file.rename(file.path(out_tmp, out_fn), file.path(out_dir, out_fn))
+
+    message(paste(strwrap(paste("Created interactive bat detection map for", yr,
+                                "survey(s) along", station_short, "-", i, "route:\n",
+                                tools::file_path_as_absolute(file.path(out_dir, out_fn)))), collapse = "\n"), "\n")
+
+  }
+
+}
