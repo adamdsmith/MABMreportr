@@ -1,3 +1,7 @@
+# MABMreportr 0.3.1
+
+* If interactive HTML maps are requested, and PDFtk is available, the HTML maps are attached to the final report rather than maintained as separate files
+
 # MABMreportr 0.3
 
 * Optionally creates an interactive HTML (leaflet) map of detections for each route along with the final report
