@@ -216,6 +216,12 @@ if (!web) {
       }))
     
     route_shp <- sf::st_read(file.path(shp_path,route_shp), quiet = TRUE)
+    
+    if (!identical(sf::st_crs(route_shp)$epsg, 4326)) {
+      message("Canonical route shapefile was reprojected into geographic coordinates.\n")
+      route_shp <- sf::st_transform(route_shp, 4326)
+    }
+    
     shp_coords <- sf::st_coordinates(route_shp) %>% 
       as.data.frame()
     names(shp_coords)[1:2] <- names(bat_coords)

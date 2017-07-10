@@ -29,17 +29,20 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
                     !is.na(lat), !is.na(lon))
 
     shp_path <- file.path(dirname(out_dir), i)
-    route_shp <- grep(pattern = "(?=.*canonical)(?=.*shp$)", list.files(shp_path),
+    route_shp <- grep(pattern = "(?=.*canonical)(?=.*shp$)",
+                      list.files(shp_path, full.names = TRUE),
                       perl = TRUE, value = TRUE)
 
     if (nrow(i_calls) == 0) {
-      message("No calls georeferenced or recorded. Map not created for ", i, " route.")
+      message("No calls georeferenced or recorded. Interactive map not created for ", i, " route.")
     } else if (length(route_shp) == 0) {
-      message("No canonical route shapefile found. Map not created for ", i, " route.")
+      message("No canonical route shapefile found. Interactive map not created for ", i, " route.")
     }
 
-    route_shp <- sf::st_read(file.path(shp_path,route_shp), quiet = TRUE) %>%
-      as("Spatial")
+    route_shp <- sf::st_read(route_shp, quiet = TRUE)
+    if (!identical(sf::st_crs(route_shp)$epsg, 4326))
+      route_shp <- sf::st_transform(route_shp, 4326)
+    route_shp <- as(route_shp, "Spatial")
 
     p <- leaflet::leaflet() %>%
       # Base map group
