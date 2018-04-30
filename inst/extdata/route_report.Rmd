@@ -211,14 +211,14 @@ if (!web) {
     req_pckg <- names(req_pckg)[!req_pckg]
     if (length(req_pckg) > 0) 
       invisible(lapply(req_pckg, function(pckg) {
-        message("The ", shQuote(pckg), " package is needed and will be installed.\n")
+        message("The ", shQuote(pckg), " package is needed and will be installed.")
         install.packages(pckg, verbose = FALSE)
       }))
     
     route_shp <- sf::st_read(file.path(shp_path,route_shp), quiet = TRUE)
     
+    # If necessary, reproject canonical route shapefile into geographic coordinates
     if (!identical(sf::st_crs(route_shp)$epsg, 4326)) {
-      message("Canonical route shapefile was reprojected into geographic coordinates.\n")
       route_shp <- sf::st_transform(route_shp, 4326)
     }
     

@@ -34,9 +34,9 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
                       perl = TRUE, value = TRUE)
 
     if (nrow(i_calls) == 0) {
-      message("No calls georeferenced or recorded. Interactive map not created for ", i, " route.")
+      message(paste(i, yr, "interactive bat detection map not created. No calls georeferenced or recorded."))
     } else if (length(route_shp) == 0) {
-      message("No canonical route shapefile found. Interactive map not created for ", i, " route.")
+      message(paste(i, yr, "interactive bat detection map not created. No canonical route shapefile found."))
     }
 
     route_shp <- sf::st_read(route_shp, quiet = TRUE)
@@ -91,11 +91,8 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
 
     # Move it
     file.rename(file.path(out_tmp, out_fn), file.path(out_dir, out_fn))
-
-    message(paste(strwrap(paste("Created interactive bat detection map for", yr,
-                                "survey(s) along", station_short, "-", i, "route:\n",
-                                tools::file_path_as_absolute(file.path(out_dir, out_fn)))), collapse = "\n"), "\n")
-
+    message(paste(i, yr, "interactive bat detection map created:\n   ",
+                   tools::file_path_as_absolute(file.path(out_dir, out_fn))))
   }
 
   # Attach html files to PDF

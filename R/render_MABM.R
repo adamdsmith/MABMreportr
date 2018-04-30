@@ -23,5 +23,5 @@ render_MABM <- function(out_dir, year, n_nwr, n_es, station, stn_start_yr,
                                   spp_path = spp_path),
                     quiet = TRUE)
   message("Created ", year, " MABM annual report for ", station, ":\n    ",
-          tools::file_path_as_absolute(file.path(out_dir, out_file)), "\n")
+          tools::file_path_as_absolute(file.path(out_dir, out_file)))
 }

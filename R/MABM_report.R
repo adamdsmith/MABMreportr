@@ -135,7 +135,7 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
 
   ### Make the report
   make_report <- function(station, interactive) {
-    message("Processing report for ", station, "\n")
+    message("Processing report for ", station)
     routes <- routes[routes$station == station, ] %>% dplyr::arrange(site)
     station <- routes$station %>% unique() %>%
       sub("NWR", "National Wildlife Refuge", .) %>%
