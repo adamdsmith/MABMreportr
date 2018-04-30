@@ -31,9 +31,9 @@ if located. To work properly, a specific directory hierarchy is expected (see De
 If `distribute` = FALSE or distribute attempt fails (see Details), the output is placed
 in an 'Annual Report' directory beneath \code{MABM_dir}.}
 
-\item{interactive}{logical (default = TRUE) indicating whether to output a standalone
-interactive leaflet map (*.html file) of bat detections along a route in a given year.
-If so, it is named similarly to, and exported with, the report *.pdf}
+\item{interactive}{logical (default = TRUE) indicating whether to attach an interactive
+leaflet map (*.html file) of bat detections along a route in a given year. If so, it is
+attached to, and exported with, the report *.pdf}
 }
 \description{
 This function generates an annual report for one or more MABM stations for, by default,

@@ -80,9 +80,9 @@
 #'  if located. To work properly, a specific directory hierarchy is expected (see Details).
 #'  If `distribute` = FALSE or distribute attempt fails (see Details), the output is placed
 #'  in an 'Annual Report' directory beneath \code{MABM_dir}.
-#' @param interactive logical (default = TRUE) indicating whether to output a standalone
-#'  interactive leaflet map (*.html file) of bat detections along a route in a given year.
-#'  If so, it is named similarly to, and exported with, the report *.pdf
+#' @param interactive logical (default = TRUE) indicating whether to attach an interactive
+#'  leaflet map (*.html file) of bat detections along a route in a given year. If so, it is
+#'  attached to, and exported with, the report *.pdf
 #' @export
 
 MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y")),
