@@ -41,10 +41,20 @@ texble(surv_log,
 
 \vspace{0.25in}
 
+```{r detection_check-{{route}}, eval = has_data, results='asis'}
+# Confirm there is call data to accommodate survey route metadata
+spp_calls <- call_info %>%
+  dplyr::filter(surv_date %in% survey_info$surv_date) 
+if (nrow(spp_calls) == 0) {
+  has_data <- FALSE
+  cat(paste("This route was surveyed, but no bat detection data were found along the route.", 
+            "Either no bats were detected or the data have not been entered into the MABM database."))
+}
+```
+
 ```{r nightly_summary-{{route}}, eval = has_data}
 # Tally bat calls, by species, for each survey night in reporting year
-spp_calls <- call_info %>% 
-    dplyr::filter(surv_date %in% survey_info$surv_date) %>%
+spp_calls <- spp_calls %>% 
     dplyr::group_by(spp, surv_date) %>% dplyr::count() %>% 
     dplyr::ungroup() %>% tidyr::complete(spp, surv_date, fill = list(n = 0)) %>%
     dplyr::left_join(spp_info, by = "spp") %>%
