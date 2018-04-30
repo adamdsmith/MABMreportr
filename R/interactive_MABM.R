@@ -82,7 +82,7 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
                                 overlayGroups = groups,
                                 position = "topleft",
                                 options = leaflet::layersControlOptions(collapsed = FALSE)) %>%
-      leaflet::moveZoomControl()
+      leaflet.extras::moveZoomControl()
 
     out_tmp <- tempdir()
     out_fn <- paste("MABM", i, yr, "interactive.html", sep = "_")
