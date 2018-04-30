@@ -35,8 +35,10 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
 
     if (nrow(i_calls) == 0) {
       message(paste(i, yr, "interactive bat detection map not created. No calls georeferenced or recorded."))
+      next()
     } else if (length(route_shp) == 0) {
       message(paste(i, yr, "interactive bat detection map not created. No canonical route shapefile found."))
+      next()
     }
 
     route_shp <- sf::st_read(route_shp, quiet = TRUE)
