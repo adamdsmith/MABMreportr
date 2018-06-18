@@ -99,10 +99,10 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
 
   # Attach html files to PDF
   pdf_pattern <- paste(shorten_station(station), paste0(yr, ".pdf$"), sep = "_")
-  in_pdf <- list.files(out_dir, pattern = pdf_pattern, full = TRUE)
+  in_pdf <- list.files(out_dir, pattern = pdf_pattern, full.names = TRUE)
   html_pattern <- paste(paste("MABM", routes$site, yr,  "interactive.html", sep = "_"),
                         collapse = "|")
-  in_html <- list.files(out_dir, pattern = html_pattern, full = TRUE)
+  in_html <- list.files(out_dir, pattern = html_pattern, full.names = TRUE)
 
   if (all(sapply(list(in_pdf, in_html), length) >= 1))
     attach_htmls(in_pdf, in_html)
