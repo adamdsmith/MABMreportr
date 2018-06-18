@@ -10,8 +10,8 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
     }))
 
   #Create a custom color scale to consistently display species
-  bat_fills <- c("orange3", "orange3", "sienna", "red2", "forestgreen", "forestgreen",
-                 "gray40", "gray40", "gray40", "gray40", "gray40", "gray40", "royalblue4",
+  bat_fills <- c("orange3", "orange3", "sienna", "red3", "forestgreen", "forestgreen",
+                 "gray40", "gray40", "gray40", "gray40", "gray40", "gray40", "royalblue",
                  "gold", "white")
   names(bat_fills) <- c("CORA", "COTO", "EPFU", "LABO", "LACI", "LANO", "MYAU",
                         "MYGR", "MYLE", "MYLU", "MYSE", "MYSO", "NYHU", "PESU",
