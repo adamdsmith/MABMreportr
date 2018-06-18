@@ -12,8 +12,6 @@ params:
   year: 0 # placeholder 
   station: placeholder
   stn_start_yr: 0 # placeholder
-  n_nwr: 0 # placeholder
-  n_es: 0 # placeholder
   route_path: placeholder
   survey_path: placeholder
   bat_path: placeholder
@@ -29,7 +27,7 @@ if (length(yr_range) > 1)
   yr_range <- paste(min(yr_range), max(yr_range), sep = " to ")
 ```
 
-The Region 4 Inventory and Monitoring Branch coordinated acoustical bat monitoring on `r params$n_nwr` National Wildlife Refuges and `r params$n_es` Ecological Services field offices in Regions 2, 3, and 4 during the `r params$year` field season. Surveys establish baseline inventories of bat species at each station and contribute to a landscape-level understanding of bat population trends and habitat associations. Bat call data were collected using Anabat SD2 detectors along road-based transects during June and July each year following the procedures outlined in the Mobile Bat Acoustical Survey Protocol^[U.S Fish and Wildlife Service. 2012. Mobile Bat Acoustical Survey Protocol, U.S. Fish and Wildlife Service, Region 4, Division of Refuges].
+The Region 4 Inventory and Monitoring Branch coordinates acoustical bat monitoring on participating National Wildlife Refuges and Ecological Services field offices in Regions 2, 3, and 4. Surveys establish baseline inventories of bat species at each station and contribute to a landscape-level understanding of bat population trends and habitat associations. Bat call data are collected using Anabat SD2 detectors along road-based transects during June and July of each year following the procedures outlined in the Mobile Bat Acoustical Survey Protocol^[U.S Fish and Wildlife Service. 2012. Mobile Bat Acoustical Survey Protocol, U.S. Fish and Wildlife Service, Region 4, Division of Refuges].
 
 This report summarizes bat calls collected along driven survey routes at `r params$station` in `r params$year` and provides annual species detections from `r yr_range` for comparison. Calls were classified using the BCID Eastern USA (version 2.7c) software.  Automated acoustical bat classification is limited in part by call quality, species filter constraints, and statistical model agreement parameters. We applied a species filter to limit classifications only to those bat species expected to occur at `r params$station` during the sampling interval. We considered species classifications conservatively by classifying only those calls with $\geq$ 5 ultrasonic pulses.  While we expect that this conservative approach resulted in robust species classifications, it necessarily means that we may underestimate the actual number of bats detected.  We geo-referenced calls to the nearest corresponding GPS location collected along the route. 
 
