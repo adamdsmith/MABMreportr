@@ -105,7 +105,7 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
       stop("At least one required MABM output file is missing. ",
            "Check your choice of `MABM_dir` or use `update = TRUE`.")
   } else {
-    MABMreportr:::setup_MABM_reports(export_dir = MABM_dir)
+    setup_MABM_reports(export_dir = MABM_dir)
   }
 
   # Set up temporary directory
