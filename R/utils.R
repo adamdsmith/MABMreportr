@@ -131,3 +131,7 @@ shorten_station <- function(station) {
   gsub(" |\\.", "", .)
 }
 
+add_blanks <- function(x, nth) {
+  x[1:nth != 1] <- ""
+  x
+}
