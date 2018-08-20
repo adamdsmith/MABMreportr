@@ -112,8 +112,7 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
   tmps <- tempfile("MABM", fileext = rep(".RDS", 4))
 
   # Get list of completed routes (stations may host >1 route)
-  routes <- readxl::read_excel(file.path(MABM_dir, "MABM_routes.xlsx"))
-  routes <- routes %>%
+  routes <- readxl::read_excel(file.path(MABM_dir, "MABM_routes.xlsx")) %>%
     dplyr::select(station = ORGNAME,
                   site = Site_Name,
                   site_notes = Loc_Notes,
@@ -145,17 +144,14 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
     # Store in temporary file
     saveRDS(routes, file = tmps[1])
 
-    survey_info <- readxl::read_excel(file.path(MABM_dir, "MABM_survey_details.xlsx"))
-    survey_info <- survey_info %>%
+    survey_info <- readxl::read_excel(file.path(MABM_dir, "MABM_survey_details.xlsx")) %>%
       dplyr::select(site = dplyr::starts_with("Site Name"),
                     surv_date = dplyr::starts_with("Date Start"),
                     gps = dplyr::starts_with("GPS"),
                     complete = dplyr::starts_with("Rt Compl"),
                     notes = Notes) %>%
-      dplyr::filter(as.integer(format(surv_date, "%Y")) == year)
-
-    survey_info <- survey_info %>%
-      dplyr::filter(site %in% routes$site) %>%
+      dplyr::filter(as.integer(format(surv_date, "%Y")) == year,
+                    site %in% routes$site) %>%
       dplyr::mutate(gps = as.logical(gps),
                     complete = as.logical(complete),
                     notes = ifelse(is.na(notes), "", notes)) %>%
@@ -165,8 +161,7 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
     saveRDS(survey_info, file = tmps[2])
 
     # Get the call data for this station...
-    calls <- readxl::read_excel(file.path(MABM_dir, "MABM_calls.xlsx"))
-    calls <- calls %>%
+    calls <- readxl::read_excel(file.path(MABM_dir, "MABM_calls.xlsx")) %>%
       dplyr::select(site = Site_Name,
                     lat = LAT,
                     lon = LONG,
