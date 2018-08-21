@@ -28,7 +28,9 @@ surv_calls <- call_info %>%
 surv_log <- survey_info %>%
     dplyr::left_join(., surv_calls, by = "surv_date") %>%
     dplyr::select(surv_date, n, complete, gps, notes) %>%
-    dplyr::mutate(surv_date = format(surv_date, format = "%d %b"))
+    dplyr::mutate(surv_date = format(surv_date, format = "%d %b"),
+                # Escape percent signs or they're interpreted as comments by TeX
+                notes = gsub("%", "\\\\%", notes))
 
 texble(surv_log, 
        caption = paste0(year, " survey route (", route_info$site, ") summary."),
