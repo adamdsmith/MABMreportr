@@ -31,16 +31,16 @@ The MABMreportr package require several programs to function properly (or at all
 
 1.  **[R](https://www.r-project.org/) (>= 3.2.5)**
 2.  **[Rtools](https://cran.r-project.org/bin/windows/Rtools/)**
-3.  **Full TeX installation**: Use the [basic MiKTeX installer](http://miktex.org/download) that matches your system architecture (e.g., 64-bit) on Windows, [MacTeX](https://tug.org/mactex/mactex-download.html) on Mac OS X, and [TeXLive](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-140003) for Linux.  Notice that neither `MABMreportr`, nor the associated [`MABM` package](https://github.com/adamdsmith/MABM) has been tested outside of 64-bit Windows 7.
+3.  **LaTeX distribution**: If you don't know what this means, we recommend you use `tinytex`. Install `tinytex` in R using the following command and following the onscreen prompts: `install.packages("tinytex"); tinytex::install_tinytex()`. Other LaTeX distribution options include [MiKTeX](http://miktex.org/download) for Windows, [MacTeX](https://tug.org/mactex/mactex-download.html) for Mac OS X, and [TeXLive](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-140003) for Linux.  Notice that neither `MABMreportr`, nor the associated [`MABM` package](https://github.com/adamdsmith/MABM) has been tested outside of 64-bit Windows 7.
 4.  **pandoc**: If you're using a relatively recent version of [RStudio](https://www.rstudio.com/products/rstudio/download/preview/), pandoc is included.  Using `MABMreportr` outside of RStudio will require a recent version of [pandoc](http://pandoc.org/installing.html) (>= 1.12.3).
 5.  **Microsoft Access**
 6.  **[PDFtk Server](https://www.pdflabs.com/tools/pdftk-server/)** 
 
-R, Rtools, RStudio, Microsoft Access, and PDFtk Server (and possibly the TeX installation) will require administrative priveleges but the installation of packages after this initial install will not.  It's likely Microsoft Access is already installed on your DOI computer.  `MABMreportr` is tested and works only on PCs running Microsoft Windows.
+R, Rtools, RStudio, Microsoft Access, and PDFtk Server will require administrative priveleges but the installation of packages after this initial install will not.  It's likely Microsoft Access is already installed on your DOI computer.  `MABMreportr` is tested only on PCs running Microsoft Windows.
 
 You also need an up-to-date, local copy of the MABM database.  Currently, this applies to two people in the world, but it will be easy to provide a remotely accessible location for this database down the road.
 
-With the installation formalities out of the way, it's simple to install and load the MABMreportr package to access its functionality.
+With the installation formalities out of the way, install and load the MABMreportr package to access its functionality.
 
 ```{r, eval = FALSE}
 # If devtools package is not installed
