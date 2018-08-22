@@ -117,49 +117,52 @@ database.
 
 ![Select MABM database file](./README-figs/select_MABM_database.png)
 
-With the MABM database identified, the macro within is call and relevant
-data from the MABM database exported to a few \*.xlsx files in the
-directory you specified initially. Note that this exporting scheme has
-not been tested on Mac OS X or Linux machines.
+With the MABM database identified, the macro within is called and
+relevant data from the MABM database exported to a few \*.xlsx files in
+the directory you specified previously. Note that this exporting scheme
+has not been tested, and probably fails spectacularly, on Mac OS X or
+Linux machines.
 
-And, when all goes well, you’ll be notified on the console.
+You’ll be notified on the console of the success or failure of this
+process.
 
 ![Success](./README-figs/MABM_export_success.png)
 
 If the data files exported from the MABM database already exist on your
-computer (e.g., because you’re preparing to create annual reports for
-the newest year of surveys), you’ll be prompted to confirm the overwrite
-of these files.
+computer (e.g., because you’re replacing last year’s database exports
+with those from the newest year of surveys), you’ll be prompted to
+confirm the overwrite of these files.
 
 ![Overwrite?](./README-figs/replace_existing.png)
 
 ### Generating annual reports
 
 The function then moves on to generating reports. By default,
-`MABM_report` will generate a report for the current calendar year
-(change with the `year` argument) for the one or more stations selected
-from the dialog box; select multiple stations by holding down the
-control/command button and clicking addition stations.
+`MABM_report` will generate a report for the current calendar year (you
+can make historic reports by changing the `year` argument) for the one
+or more stations selected from the dialog box; select multiple stations
+by holding down the control/command button and clicking addition
+stations.
 
 ![Pick a station(s), any station(s)](./README-figs/select_stations.png)
 
 The progress of report generation is reported to the console. Of course
 successful report generation requires that the MABM database contains
 data for a given station in the specified year. If not, that station is
-skipped and a error message is returned.
+skipped and an message indicating this fact is returned.
 
 ![Report generation progress](./README-figs/reports_complete.png)
 
 By default (`distribute = TRUE`), the function looks for a particular
-file hierarchy in the directory specified initially to contain (or in
-which to output) MABM exports and attempts to place the output report in
-an ‘Annual Report’ directory within the base directory for each MABM
+file hierarchy in the directory specified to house the MABM database
+exports. Specifically, it attempts to place the output report in an
+‘Annual Report’ directory within the base/home directory for each MABM
 station, if it can be located. Again, to work properly, this requires a
 specific directory hierarchy. Please see the Details section of
-`?MABM_report` for more information. This default behavior can be
-overridden by setting `update = FALSE` and specifying an output location
-using the `out_dir` argument. See `?MABM_report` form additional
-information.
+`?MABM_report` for more information and an example hierarchy. If
+`distribute = TRUE` but the base/home directory is not located, or if
+`distribute = FALSE`, the output report is placed in a generic ‘Annual
+Reports’ directory alongside the MABM database exports.
 
 Likewise, by default (`interactive = TRUE`), the function generates an
 interactive `leaflet` map of georeferenced bat detections for each
