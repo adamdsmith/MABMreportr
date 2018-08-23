@@ -157,6 +157,13 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
                     notes = ifelse(is.na(notes), "", notes)) %>%
       dplyr::arrange(site, surv_date)
     if (nrow(survey_info) == 0) stop(paste0("No MABM data found at ", station, " in ", year, ".\n"))
+    if (nrow(survey_info) > nrow(unique(survey_info))) {
+      print(survey_info)
+      stop("Duplicated records in the survey log on ", station, " in ", year, " (see above).",
+           "\n   Check for duplicated survey entries in the `tbl_Events` table of the MABM database.",
+           call. = FALSE)
+    }
+
     # Store it
     saveRDS(survey_info, file = tmps[2])
 
