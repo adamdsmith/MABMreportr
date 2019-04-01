@@ -66,10 +66,10 @@ MABMreportr package to access its functionality.
 
 ``` r
 # If devtools package is not installed
-install.packages("devtools", dependencies = TRUE)
+install.packages("remotes", dependencies = TRUE)
 
 # Now install and load MABMreportr
-devtools::install_github("adamdsmith/MABMreportr")
+remotes::install_github("adamdsmith/MABMreportr")
 library("MABMreportr")
 ```
 
