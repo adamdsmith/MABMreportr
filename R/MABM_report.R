@@ -80,6 +80,7 @@
 #'  if located. To work properly, a specific directory hierarchy is expected (see Details).
 #'  If `distribute` = FALSE or distribute attempt fails (see Details), the output is placed
 #'  in an 'Annual Report' directory beneath \code{MABM_dir}.
+#' @param key character scalar of Google Maps API key
 #' @param interactive logical (default = TRUE) indicating whether to attach an interactive
 #'  leaflet map (*.html file) of bat detections along a route in a given year. If so, it is
 #'  attached to, and exported with, the report *.pdf
@@ -87,7 +88,9 @@
 
 MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y")),
                         MABM_dir = NULL, update = FALSE, distribute = TRUE,
-                        interactive = TRUE) {
+                        key = NULL, interactive = TRUE) {
+
+  if (is.null(key)) stop("This function now requires a Google API key. See https://bit.ly/2M4AhnG")
 
   if (is.null(MABM_dir)) {
     ans <- yesno()
@@ -216,7 +219,7 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
     render_MABM(year = year, station = station,
                 stn_start_yr = start_yr, route_path = tmps[1],
                 survey_path = tmps[2], bat_path = tmps[3], spp_path = tmps[4],
-                out_dir = out_dir)
+                out_dir = out_dir, key = key)
 
     if (interactive) interactive_MABM(station, routes, calls, spp_info, year, out_dir)
 

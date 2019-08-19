@@ -17,6 +17,7 @@ params:
   bat_path: placeholder
   spp_path: placeholder
   out_dir: placeholder
+  goog_API_key: placeholder
 ---
 
 ```{r setup, include=FALSE}
@@ -46,6 +47,12 @@ spp_info <- readRDS(params$spp_path)
 
 ## Retrieve route-level report generating code
 route_rmd <- system.file("extdata", "route_report.Rmd", package = "MABMreportr")
+
+# Set up Google API key
+ggmap::register_google(params$goog_API_key)
+opt <- getOption('ggmap')
+opt$google$signature <- NA
+options(ggmap = opt)
 
 ## Generate reports for each route at station
 routes <- sort(route_dat$site)

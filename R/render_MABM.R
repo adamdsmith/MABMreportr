@@ -1,5 +1,5 @@
 render_MABM <- function(out_dir, year, station, stn_start_yr,
-                        route_path, survey_path, bat_path, spp_path) {
+                        route_path, survey_path, bat_path, spp_path, key) {
 
   # Need better error catching, but this will do for now...
   if (is.null(station)) stop("You must provide a MABM station.")
@@ -19,7 +19,8 @@ render_MABM <- function(out_dir, year, station, stn_start_yr,
                                   route_path = route_path,
                                   survey_path = survey_path,
                                   bat_path = bat_path,
-                                  spp_path = spp_path),
+                                  spp_path = spp_path,
+                                  goog_API_key = key),
                     quiet = TRUE)
   message("Created ", year, " MABM annual report for ", station, ":\n    ",
           tools::file_path_as_absolute(file.path(out_dir, out_file)))
