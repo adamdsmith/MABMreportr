@@ -1,6 +1,6 @@
 # MABMreportr 0.3.2
 
-* A necessary evil, `MABM_report` now requires a Google Maps API key to be passed for report generation. Future versions may explore open source map options to avoid this requirement. To get a Google API key, see https://bit.ly/2M4AhnG
+* A necessary evil, `MABM_report` now requires a Google Maps API key to be passed for report generation. Future versions may explore open source map options to avoid this requirement. To get a Google API key, see [https://developers.google.com/maps/documentation/maps-static/get-api-key](https://developers.google.com/maps/documentation/maps-static/get-api-key)
 
 # MABMreportr 0.3.1
 

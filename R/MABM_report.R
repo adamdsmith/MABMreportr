@@ -90,7 +90,8 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
                         MABM_dir = NULL, update = FALSE, distribute = TRUE,
                         key = NULL, interactive = TRUE) {
 
-  if (is.null(key)) stop("This function now requires a Google API key. See https://bit.ly/2M4AhnG")
+  if (is.null(key)) stop("This function now requires a Google API key. ",
+                         "See https://developers.google.com/maps/documentation/maps-static/get-api-key")
 
   if (is.null(MABM_dir)) {
     ans <- yesno()
