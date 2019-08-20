@@ -1,3 +1,7 @@
+# MABMreportr 0.3.2
+
+* A necessary evil, `MABM_report` now requires a Google Maps API key to be passed for report generation. Future versions may explore open source map options to avoid this requirement. To get a Google API key, see https://bit.ly/2M4AhnG
+
 # MABMreportr 0.3.1
 
 * If interactive HTML maps are requested, and PDFtk is available, the HTML maps are attached to the final report rather than maintained as separate files

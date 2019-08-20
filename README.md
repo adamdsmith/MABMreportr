@@ -2,6 +2,7 @@
 Status](https://travis-ci.org/adamdsmith/MABMreportr.png)](https://travis-ci.org/adamdsmith/MABMreportr)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 USFWS Disclaimer
 ================
 
@@ -66,10 +67,10 @@ MABMreportr package to access its functionality.
 
 ``` r
 # If devtools package is not installed
-install.packages("remotes", dependencies = TRUE)
+install.packages("devtools", dependencies = TRUE)
 
 # Now install and load MABMreportr
-remotes::install_github("adamdsmith/MABMreportr")
+devtools::install_github("adamdsmith/MABMreportr")
 library("MABMreportr")
 ```
 
@@ -79,6 +80,15 @@ Using MABMreportr
 We have only a single function with which to concern ourselves,
 `MABM_report`. The arguments and options available for this function are
 detailed in its associated help file: `?MABM_report`.
+
+### Google API key
+
+NOTE: Google now requires an API key to access their map products. To
+get an API key, see [here](https://bit.ly/2M4AhnG). It is effectively
+free, but it does require having a credit card number on file with
+Google. Future versions of `MABMreportr` will explore open source map
+options to avoid the API key requirement. The API key is passed to the
+`MABM_report` function via the `key` argument.
 
 ### Preparing to generate annual reports
 
@@ -92,7 +102,7 @@ routes. It needs only to be run a single time after the data for a given
 survey year has been entered into the database.
 
 ``` r
-MABM_report(update = TRUE)
+MABM_report(update = TRUE, key = "<your API key>")
 ```
 
 You will then be prompted, in the console, to indicate if the current

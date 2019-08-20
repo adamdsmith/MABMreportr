@@ -44,10 +44,10 @@ With the installation formalities out of the way, install and load the MABMrepor
 
 ```{r, eval = FALSE}
 # If devtools package is not installed
-install.packages("remotes", dependencies = TRUE)
+install.packages("devtools", dependencies = TRUE)
 
 # Now install and load MABMreportr
-remotes::install_github("adamdsmith/MABMreportr")
+devtools::install_github("adamdsmith/MABMreportr")
 library("MABMreportr")
 ```
 
@@ -55,12 +55,17 @@ library("MABMreportr")
 
 We have only a single function with which to concern ourselves, `MABM_report`.  The arguments and options available for this function are detailed in its associated help file: `?MABM_report`.
 
+
+### Google API key
+
+NOTE: Google now requires an API key to access their map products. To get an API key, see [here](https://bit.ly/2M4AhnG). It is effectively free, but it does require having a credit card number on file with Google. Future versions of `MABMreportr` will explore open source map options to avoid the API key requirement. The API key is passed to the `MABM_report` function via the `key` argument.
+
 ### Preparing to generate annual reports
 
 Prior to the first attempt to generate annual reports (or after the MABM database has been updated with a new season of data), several data tables must be exported from the MABM database.  This is accomplished by calling `MABM_report` using the `update = TRUE` argument (default is `FALSE`). In short, this function calls a macro planted inside the MABM database to export the data necessary to create annual reports for MABM routes. It needs only to be run a single time after the data for a given survey year has been entered into the database.
 
 ```{r, eval = FALSE}
-MABM_report(update = TRUE)
+MABM_report(update = TRUE, key = "<your API key>")
 ```
 
 You will then be prompted, in the console, to indicate if the current working directory either (1) contains MABM database exports (if you're not updating) or (2) is where you would like to place the exports (if this is the first run or an update).  In the example below, we indicate with 'n' or 'N' that it is not the directory where we wish to place database exports.  Had it been the correct directory, valid responses are 'y' or 'Y'.  'c' or 'C' cancels the function.
