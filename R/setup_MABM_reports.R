@@ -53,7 +53,7 @@ setup_MABM_reports <- function(access_exe = NULL, MABM_access_db = NULL,
 
     # Find MABM database
     if (!is.null(MABM_access_db)) {
-        MABM_access_db <- normalizePath(MABM_access_db)
+        MABM_access_db <- normalizePath(MABM_access_db, mustWork = TRUE)
     } else {
         MABM_access_db <- utils::choose.files(default = "*.accdb",
                                           caption = "Please select the MABM database file.",
