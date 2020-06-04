@@ -3,7 +3,6 @@
 \docType{package}
 \name{MABMreportr}
 \alias{MABMreportr}
-\alias{MABMreportr-package}
 \title{\code{MABMreportr} package}
 \description{
 See the \href{https://github.com/adamdsmith/MABMreportr}{README} on GitHub

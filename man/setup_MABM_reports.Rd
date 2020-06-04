@@ -4,8 +4,7 @@
 \alias{setup_MABM_reports}
 \title{Export data from MABM database necessary for report preparation}
 \usage{
-setup_MABM_reports(access_exe = NULL, MABM_access_db = NULL,
-  export_dir = NULL)
+setup_MABM_reports(access_exe = NULL, MABM_access_db = NULL, export_dir = NULL)
 }
 \arguments{
 \item{access_exe}{character string indicating the path to the MS Access executable.  Default (NULL)

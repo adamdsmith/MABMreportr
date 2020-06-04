@@ -42,4 +42,4 @@ Copyright: This software is in the public domain because it contains materials
 LazyData: TRUE
 URL: https://github.com/adamdsmith/MABMreportr
 BugReports: https://github.com/adamdsmith/MABMreportr/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.0
