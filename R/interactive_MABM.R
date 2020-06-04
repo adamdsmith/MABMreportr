@@ -19,7 +19,8 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
   sppPal <- leaflet::colorFactor(palette = bat_fills, domain = names(bat_fills))
 
   # Make bat icon list
-  batIcons <- MABM:::makeBatIconList()
+  mBIL <- utils::getFromNamespace("makeBatIconList", "MABM")
+  batIcons <- mBIL()
 
   for (i in routes$site) {
 
@@ -73,6 +74,7 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
       gsub("ecological services", "ES", ., ignore.case = TRUE)
 
     # Add species legend and layer control
+    mZC <- utils::getFromNamespace("moveZoomControl", "leaflet.extras")
     p <- p %>%
       leaflet::addLegend("topleft", pal = sppPal, values = i_calls$spp,
                          title = paste(paste(strwrap(station_short, 16),
@@ -84,7 +86,7 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
                                 overlayGroups = groups,
                                 position = "topleft",
                                 options = leaflet::layersControlOptions(collapsed = FALSE)) %>%
-      leaflet.extras::moveZoomControl()
+      mZC()
 
     out_tmp <- tempdir()
     out_fn <- paste("MABM", i, yr, "interactive.html", sep = "_")
