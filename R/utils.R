@@ -119,7 +119,8 @@ yesno <- function() {
 }
 
 find_pdftk <- function() {
-  pdftk <- grep("pdftk", MABM:::two_deep("C:/"), ignore.case = TRUE, value = TRUE)
+  two_deep <- utils::getFromNamespace("two_deep", "MABM")
+  pdftk <- grep("pdftk", two_deep("C:/"), ignore.case = TRUE, value = TRUE)
   if (length(pdftk) == 0) return(character(0))
   pdftk <- paste(pdftk, "bin", "pdftk.exe", sep = "/")
   pdftk
