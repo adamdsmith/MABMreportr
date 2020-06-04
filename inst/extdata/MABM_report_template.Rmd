@@ -1,9 +1,14 @@
 ---
-title: placeholder 
-subtitle: placeholder
+title: |
+    | ![](usfws_refuges_logos.png){width=5cm}
+    | 
+    | \LARGE Region 4 Inventory and Monitoring Branch 
+subtitle: |
+    | \Large Mobile Acoustical Bat Monitoring
+    | \Large Annual Summary Report
 author: '`r params$year`'
 date: '`r params$station`'
-output: 
+output:
   pdf_document:
     includes:
       in_header: MABM_report_preamble.tex
