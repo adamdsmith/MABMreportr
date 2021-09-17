@@ -49,7 +49,7 @@ route_dat <- readRDS(params$route_path)
 survey_dat <- readRDS(params$survey_path)
 call_dat <- readRDS(params$bat_path)
 spp_info <- readRDS(params$spp_path)
-call_dat <- left_join(call_dat, spp_info, by = "spp")
+call_dat <- dplyr::left_join(call_dat, spp_info, by = "spp")
 
 ## Retrieve route-level report generating code
 route_rmd <- system.file("extdata", "route_report.Rmd", package = "MABMreportr")
