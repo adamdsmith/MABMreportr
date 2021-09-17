@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 ```{r data-prep-{{route}}, echo=FALSE}
 station_short <- station %>% gsub("national wildlife refuge", "NWR", ., ignore.case = TRUE) %>%
     gsub("ecological services", "ES", ., ignore.case = TRUE)
@@ -284,7 +289,7 @@ if (!web) {
       ggplot2::scale_fill_manual("Species", values = spp_cols,
                                  guide = ggplot2::guide_legend(title.hjust =0.5,
                                                                title.position = "top",
-                                                               nrow = ifelse(n_spp > 6, 2, 1),
+                                                               nrow = ceiling(n_spp / 3),
                                                                byrow = TRUE))
     spp_leg <- cowplot::get_legend(p2)
     
@@ -295,12 +300,12 @@ if (!web) {
                                        shape = surv_date), size = 2) +
       ggplot2::scale_shape_manual("Survey date",
                                   values = poss_shapes[1:length(unique(spp_calls$surv_date))],
-                                  guide = FALSE) +
-      ggplot2::scale_fill_manual("Species", values = spp_cols, guide = FALSE)
+                                  guide = "none") +
+      ggplot2::scale_fill_manual("Species", values = spp_cols, guide = "none")
     
     p <- cowplot::ggdraw(p) + cowplot::draw_grob(leg_shape, 0, 0.96, 1, 0.02)
     
-    spp_ht <- ifelse(n_spp > 6, 0.15, 0.1)
+    spp_ht <- 0.1 + (0.05 * (ceiling(n_spp / 3) - 1))
     
     # Save to temp file
     tmp_fig <- tempfile(fileext = ".pdf")

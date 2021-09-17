@@ -13,10 +13,14 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
   bat_fills <- c("orange3", "orange3", "sienna", "red3", "forestgreen", "forestgreen",
                  "gray40", "gray40", "gray40", "gray40", "gray40", "gray40", "royalblue",
                  "gold", "white")
-  names(bat_fills) <- c("CORA", "COTO", "EPFU", "LABO", "LACI", "LANO", "MYAU",
-                        "MYGR", "MYLE", "MYLU", "MYSE", "MYSO", "NYHU", "PESU",
-                        "UNKN")
-  sppPal <- leaflet::colorFactor(palette = bat_fills, domain = names(bat_fills))
+  bat_fill_spp <- c("CORA", "COTO", "EPFU", "LABO", "LACI",
+                    "LANO", "MYAU", "MYGR", "MYLE", "MYLU",
+                    "MYSE", "MYSO", "NYHU", "PESU", "UNKN")
+  bat_fill_df <- data.frame(bat_fills, bat_fill_spp, stringsAsFactors = FALSE) %>%
+    left_join(spp_info, by = c("bat_fill_spp" = "spp")) %>%
+    arrange(spp_cn)
+
+  sppPal <- leaflet::colorFactor(palette = bat_fill_df$bat_fills, domain = bat_fill_df$spp_cn)
 
   # Make bat icon list
   mBIL <- utils::getFromNamespace("makeBatIconList", "MABM")
@@ -76,7 +80,7 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
     # Add species legend and layer control
     mZC <- utils::getFromNamespace("moveZoomControl", "leaflet.extras")
     p <- p %>%
-      leaflet::addLegend("topleft", pal = sppPal, values = i_calls$spp,
+      leaflet::addLegend("topleft", pal = sppPal, values = i_calls$spp_cn,
                          title = paste(paste(strwrap(station_short, 16),
                                              collapse = "<br>&nbsp;"),
                                        paste("Route:", i),
