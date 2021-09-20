@@ -81,8 +81,7 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
     mZC <- utils::getFromNamespace("moveZoomControl", "leaflet.extras")
     p <- p %>%
       leaflet::addLegend("topleft", pal = sppPal, values = i_calls$spp_cn,
-                         title = paste(paste(strwrap(station_short, 16),
-                                             collapse = "<br>&nbsp;"),
+                         title = paste(station_short,
                                        paste("Route:", i),
                                        paste("Year:", yr), sep = "<br>"),
                          opacity = 1) %>%
