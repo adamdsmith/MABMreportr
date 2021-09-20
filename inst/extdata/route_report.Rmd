@@ -226,7 +226,7 @@ if (!web) {
     message("No canonical route shapefile found for ", paste(route_info$site, "route."),
             " Map not created.\n") 
   } else {
-    req_pckg <- c("cowplot", "gridExtra", "sf")
+    req_pckg <- c("sf")
     req_pckg <- sapply(req_pckg, requireNamespace, quietly = TRUE)
     req_pckg <- names(req_pckg)[!req_pckg]
     if (length(req_pckg) > 0) 
@@ -263,56 +263,41 @@ if (!web) {
       ggplot2::geom_path(data = shp_coords, 
                          ggplot2::aes(x = lon, y = lat, group = L1), size = 0.5)
     
-    # Get the survey date legend
-    p1 <- p + ggplot2::geom_point(data = spp_calls, 
-                                  ggplot2::aes(x = lon, y = lat, shape = surv_date),
-                                  size = 2, color = "black") +
-      ggplot2::scale_shape_manual("Survey date:",
-                                  values = poss_shapes[1:length(unique(spp_calls$surv_date))],
-                                  guide = ggplot2::guide_legend(direction = "horizontal")) +
-      ggplot2::theme(legend.title = ggplot2::element_text(size = 12, hjust = 1),
-                     legend.text = ggplot2::element_text(size = 11, hjust = 0),
-                     legend.background = ggplot2::element_rect(fill = scales::alpha("white", 0.5)))
-    
-    leg_shape <- cowplot::get_legend(p1)
-    
-    # Get the species legend
     n_spp <- dplyr::n_distinct(spp_calls$spp)
     cols <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", 
               "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#FFFF99", "#B15928")
     spp_cols <- cols[1:n_spp]
     
-    p2 <- p + 
-      ggplot2::geom_point(data = spp_calls, 
-                          ggplot2::aes(x = lon, y = lat, fill = spp_cn), shape = 21,
-                          size = 2) +
+    # Build it 
+    p1 <- p + ggplot2::geom_point(data = spp_calls,
+                              ggplot2::aes(x = lon, y = lat, shape = surv_date, fill = spp_cn),
+                              size = 2, color = "black") +
       ggplot2::scale_fill_manual("Species", values = spp_cols,
                                  guide = ggplot2::guide_legend(title.hjust =0.5,
                                                                title.position = "top",
-                                                               nrow = ceiling(n_spp / 3),
-                                                               byrow = TRUE)) +
-      theme(legend.background = element_rect(color = "black", fill = "gray85"))
-    spp_leg <- cowplot::get_legend(p2)
-    
-    # Construct final plot
-    p <- p +
-      ggplot2::geom_point(data = spp_calls, 
-                          ggplot2::aes(x = lon, y = lat, fill = spp_cn, 
-                                       shape = surv_date), size = 2) +
-      ggplot2::scale_shape_manual("Survey date",
+                                                               nrow = ceiling(n_spp / 2),
+                                                               byrow = TRUE,
+                                                               order = 1,
+                                                               override.aes = list(shape = 21))) +
+      ggplot2::scale_shape_manual("Survey date:",
                                   values = poss_shapes[1:length(unique(spp_calls$surv_date))],
-                                  guide = "none") +
-      ggplot2::scale_fill_manual("Species", values = spp_cols, guide = "none")
+                                  guide = ggplot2::guide_legend(direction = "horizontal",
+                                                                order = 2)) +
+      ggplot2::theme(legend.title = ggplot2::element_text(size = 12, hjust = 1),
+                     legend.text = ggplot2::element_text(size = 11, hjust = 0),
+                     legend.background = ggplot2::element_rect(color = "black",
+                                                               fill = "gray95"),
+                     legend.position = "top",
+                     legend.justification = "top",
+                     legend.box = "vertical",
+                     legend.box.spacing = grid::unit(-1.5, "cm"),
+                     panel.border = ggplot2::element_rect(colour = "black", fill=NA, size=2))
     
-    p <- cowplot::ggdraw(p) + cowplot::draw_grob(leg_shape, 0, 0.96, 1, 0.02)
-    
-    spp_ht <- 0.1 + (0.05 * (ceiling(n_spp / 3) - 1))
-    
+
     # Save to temp file
     tmp_fig <- tempfile(fileext = ".pdf")
-    pdf(tmp_fig, width = 6.5, height = 6.5)
-    gridExtra::grid.arrange(spp_leg, p, nrow = 2, 
-                            heights = c(spp_ht, 1 - spp_ht))
+    pdf(tmp_fig, width = 6.5, height = 7.5)
+    print(p1)
     invisible(dev.off())
     
     # Convert slashes to LaTeX can deal with them...
