@@ -97,7 +97,10 @@ MABM_report <- function(station = NULL, year = as.integer(format(Sys.Date(), "%Y
     ans <- yesno()
     if (ans == "c") stop("Function cancelled.")
     if (ans == "y") MABM_dir <- getwd()
-    if (ans == "n") MABM_dir <- choose.dir("C:/", caption = "Select folder with MABM database exports.")
+    if (ans == "n") {
+      MABM_dir <- choose.dir("C:/", caption = "Select folder with MABM database exports.")
+      message("Using database exports in ", normalizePath(MABM_dir, winslash = "/"))
+    }
     if (is.na(MABM_dir)) stop("No directory selected.")
   } else MABM_dir <- file.path(MABM_dir)
 
