@@ -290,7 +290,8 @@ if (!web) {
                                  guide = ggplot2::guide_legend(title.hjust =0.5,
                                                                title.position = "top",
                                                                nrow = ceiling(n_spp / 3),
-                                                               byrow = TRUE))
+                                                               byrow = TRUE)) +
+      theme(legend.background = element_rect(color = "black", fill = "gray85"))
     spp_leg <- cowplot::get_legend(p2)
     
     # Construct final plot
