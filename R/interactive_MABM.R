@@ -17,8 +17,8 @@ interactive_MABM <- function(station, routes, calls, spp_info, yr, out_dir) {
                     "LANO", "MYAU", "MYGR", "MYLE", "MYLU",
                     "MYSE", "MYSO", "NYHU", "PESU", "UNKN")
   bat_fill_df <- data.frame(bat_fills, bat_fill_spp, stringsAsFactors = FALSE) %>%
-    left_join(spp_info, by = c("bat_fill_spp" = "spp")) %>%
-    arrange(spp_cn)
+    dplyr::left_join(spp_info, by = c("bat_fill_spp" = "spp")) %>%
+    dplyr::arrange(spp_cn)
 
   sppPal <- leaflet::colorFactor(palette = bat_fill_df$bat_fills, domain = bat_fill_df$spp_cn)
 
