@@ -284,7 +284,7 @@ if (!web) {
     
     p2 <- p + 
       ggplot2::geom_point(data = spp_calls, 
-                          ggplot2::aes(x = lon, y = lat, fill = spp), shape = 21,
+                          ggplot2::aes(x = lon, y = lat, fill = spp_cn), shape = 21,
                           size = 2) +
       ggplot2::scale_fill_manual("Species", values = spp_cols,
                                  guide = ggplot2::guide_legend(title.hjust =0.5,
@@ -296,7 +296,7 @@ if (!web) {
     # Construct final plot
     p <- p +
       ggplot2::geom_point(data = spp_calls, 
-                          ggplot2::aes(x = lon, y = lat, fill = spp, 
+                          ggplot2::aes(x = lon, y = lat, fill = spp_cn, 
                                        shape = surv_date), size = 2) +
       ggplot2::scale_shape_manual("Survey date",
                                   values = poss_shapes[1:length(unique(spp_calls$surv_date))],
