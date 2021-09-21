@@ -125,7 +125,7 @@ texble(spp_table, digits = 2, longtable = TRUE,
 
 ```{r route_spp_plot-{{route}}, fig.keep = "none", eval = has_data}
 if (n_yrs > 1) {
-  ggplot2::theme_set(ggplot2::theme_classic(base_size = 15))
+  ggplot2::theme_set(ggplot2::theme_classic(base_size = 14))
   
   # Determine page orientation and figure dimensions
   lscape <- (dplyr::n_distinct(spp_calls$spp_cn) > 8)
@@ -137,7 +137,7 @@ if (n_yrs > 1) {
   
   # Shift point labels accordingly
   spp_calls <- shift_point_y(spp_calls, "spp_cn", "det_rate", 
-                             shift_prop = ifelse(reduce, 0.175, 0.125),
+                             shift_prop = ifelse(reduce, 0.2, 0.15),
                              ymin = 0)
   
   # Now create plot
@@ -148,7 +148,7 @@ if (n_yrs > 1) {
     ggplot2::geom_line() +
     ggplot2::geom_point(ggplot2::aes(size = n_survs), shape = 21, fill = "white") +
     ggplot2::geom_text(ggplot2::aes(y = adj_y, label = n), hjust = 0.5, vjust = 0.5, size = 2.5) + 
-    ggplot2::scale_size("# surveys", range = c(1,3), breaks = seq(max(spp_calls$n_survs)), 
+    ggplot2::scale_size("# surveys", range = c(1,4), breaks = seq(max(spp_calls$n_survs)), 
                limits = c(1, max(spp_calls$n_survs)),
                guide = ggplot2::guide_legend(title.hjust =0.5, title.position = "top", nrow = 1)) +
     ggplot2::scale_x_continuous("Year", breaks = yr_brks, labels = yr_labs, expand = c(0.075, 0)) + 
