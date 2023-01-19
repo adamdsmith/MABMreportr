@@ -25,10 +25,12 @@
 setup_MABM_reports <- function(access_exe = NULL, MABM_access_db = NULL,
                                export_dir = NULL) {
 
-    if (is.null(export_dir)) {
-      export_dir <- choose.dir("C:/", caption = "Select folder for MABM database exports.")
-      if (is.na(export_dir)) stop("No export directory selected.")
-    } else export_dir <- file.path(export_dir)
+    ## Currently obsolete; no longer working
+    ## Export directory is now hardwired into the macro
+    ##if (is.null(export_dir)) {
+    ##  export_dir <- choose.dir("C:/", caption = "Select folder for MABM database exports.")
+    ##  if (is.na(export_dir)) stop("No export directory selected.")
+    ##} else export_dir <- file.path(export_dir)
 
     # Find access executable
     if (is.null(access_exe)) {
@@ -52,14 +54,13 @@ setup_MABM_reports <- function(access_exe = NULL, MABM_access_db = NULL,
     if (!file.exists(access_exe)) stop("Microsoft Access executable not found at that location.")
 
     # Find MABM database
-    if (!is.null(MABM_access_db)) {
-        MABM_access_db <- normalizePath(MABM_access_db, mustWork = TRUE)
-    } else {
+    if (is.null(MABM_access_db)) {
         MABM_access_db <- utils::choose.files(default = "*.accdb",
                                           caption = "Please select the MABM database file.",
                                           multi = FALSE)
         if (length(MABM_access_db) == 0) stop("Function cancelled. No database file selected.")
     }
+    MABM_access_db <- normalizePath(MABM_access_db, winslash = "/", mustWork = TRUE)
 
     if (!file.exists(MABM_access_db) && tools::file_ext(MABM_access_db) != "accdb")
         stop("MABM database file not found, or wrong file type.")
@@ -69,17 +70,14 @@ setup_MABM_reports <- function(access_exe = NULL, MABM_access_db = NULL,
     # Execute macro with MABM MS Access database
     # Produces 4 spreadsheets: MABM_calls, MABM_survey_details, MABM_spp_details,
     #                          and MABM_routes
-    status <- system(paste(shQuote(access_exe),
-                           shQuote(normalizePath(MABM_access_db)),
-                           '/x Export_MABM_info /nostartup /cmd',
-                           export_dir))
+    status <- shell(paste(shQuote(MABM_access_db), '/X Export_MABM_info /nostartup'))
     if (status != 0) stop("MABM Access macro failed.")
 
     if (all(file.exists(file.path(export_dir, "MABM_calls.xlsx")),
             file.exists(file.path(export_dir, "MABM_survey_details.xlsx")),
             file.exists(file.path(export_dir, "MABM_spp_details.xlsx")),
             file.exists(file.path(export_dir, "MABM_routes.xlsx")))) {
-      cat("\nMABM Access database tables successfully exported to", export_dir, "\n\n")
+      cat("\nMABM Access database tables successfully exported.\n\n")
     } else stop("Export from MABM Access database failed.")
 
 }
