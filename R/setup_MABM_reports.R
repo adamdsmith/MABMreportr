@@ -65,7 +65,7 @@ setup_MABM_reports <- function(access_exe = NULL, MABM_access_db = NULL,
     if (!file.exists(MABM_access_db) && tools::file_ext(MABM_access_db) != "accdb")
         stop("MABM database file not found, or wrong file type.")
 
-    if (!dir.exists(export_dir)) dir.create(export_dir)
+    ##if (!dir.exists(export_dir)) dir.create(export_dir)
 
     # Execute macro with MABM MS Access database
     # Produces 4 spreadsheets: MABM_calls, MABM_survey_details, MABM_spp_details,
